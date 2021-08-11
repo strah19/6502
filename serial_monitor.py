@@ -17,7 +17,17 @@ def serial_read():
   return data
 
 while True:
-  cmd = input("enter binary file: ")
-  with open(cmd, "rb") as binary:
-    rom_data = bytearray(binary.read())
-    arduino.write(rom_data)
+  #cmd = input("enter binary file: ")
+  #with open(cmd, "rb") as binary:
+   # rom_data = bytearray(binary.read())
+    #arduino.write(rom_data)
+
+    #for writing a specific address
+    data1 = int(input("enter data for 0x7ffc: "))
+    data2 = int(input("enter data for 0x7ffd: "))
+
+    pair = bytearray()
+    pair.append(data1)
+    pair.append(data2)
+
+    arduino.write(pair)
