@@ -75,7 +75,7 @@ void write_eeprom(byte data, word address) {
 
 byte read_eeprom(word address) {  
   delay(5);
-  Serial.println("reading data from address " + String(address));
+  //Serial.println("reading data from address " + String(address));
 
   set_io_pins(INPUT);
 
@@ -160,23 +160,13 @@ void setup() {
 
   disable_SDP();
 
-  Serial.println(read_eeprom(0x7ffc));
-  Serial.println(read_eeprom(0x7ffd));
+  print_contents();
 }
 
 int address_counter = 1;
 
 void loop() {
   while (!Serial.available());  
-  //int data = Serial.read();
-  //write_eeprom(data, address_counter++); 
-
-  //Code for writing at a specific address
-
-  int data1 = Serial.read();
-  int data2 = Serial.read();
-  
-  write_eeprom(data1, 0x7ffc);
-  write_eeprom(data2, 0x7ffd);
-  write_eeprom(0, 0x00);
+  int data = Serial.read();
+  write_eeprom(data, address_counter++); 
 }
