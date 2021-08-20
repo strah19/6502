@@ -6,17 +6,21 @@
 
 import serial
 
-com = input("enter port (COM1, COM2, COM3, etc.) of the arduino:  ")
-
-arduino = serial.Serial(port=com, baudrate=9600, timeout=.1)
-print("connected!")
-
 def serial_read():
   data = arduino.read()
   return data
 
-while True:
-  cmd = input("enter binary file: ")
-  with open(cmd, "rb") as binary:
-    rom_data = bytearray(binary.read())
-    arduino.write(rom_data)
+com = input("enter port (COM1, COM2, COM3, etc.) of the arduino:  ")
+
+arduino = serial.Serial(port=com, baudrate=9600, timeout=.1)
+
+if arduino.isOpen():
+  print("connected!")
+
+  while True:
+    cmd = input("enter binary file: ")
+    with open(cmd, "rb") as binary:
+      rom_data = bytearray(binary.read())
+      arduino.write(rom_data)
+else:
+  print("unable to connect to", com)

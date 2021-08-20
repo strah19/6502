@@ -159,14 +159,22 @@ void setup() {
   delay(1);
 
   disable_SDP();
-
+  
   print_contents();
 }
 
-int address_counter = 1;
+int address_counter = 1; 
+bool clear_test = false;
 
 void loop() {
-  while (!Serial.available());  
+  while(!Serial.available()) {
+    if (clear_test) {
+      write_eeprom(0xea, address_counter);
+      clear_test = false;
+    }
+  }
+
   int data = Serial.read();
-  write_eeprom(data, address_counter++); 
+  write_eeprom(data, address_counter++);  
+  clear_test = true;
 }
