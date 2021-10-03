@@ -75,7 +75,6 @@ void write_eeprom(byte data, word address) {
 
 byte read_eeprom(word address) {  
   delay(5);
-  //Serial.println("reading data from address " + String(address));
 
   set_io_pins(INPUT);
 
@@ -159,7 +158,7 @@ void setup() {
   delay(1);
 
   disable_SDP();
-  
+
   print_contents();
 }
 
@@ -168,13 +167,9 @@ bool clear_test = false;
 
 void loop() {
   while(!Serial.available()) {
-    if (clear_test) {
-      write_eeprom(0xea, address_counter);
-      clear_test = false;
-    }
   }
 
   int data = Serial.read();
   write_eeprom(data, address_counter++);  
-  clear_test = true;
+  delay(10);
 }
