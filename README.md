@@ -1,3 +1,4 @@
 # 6502
 
-![image not found](https://github.com/strah19/6502/blob/master/Schematic_EEPROM_Programmer_2021-08-08.png?raw=true)
+# Build
+To run vasm, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir file.s -o objectname`
