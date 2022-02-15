@@ -7,16 +7,19 @@ E  = %10000000
 RW = %01000000
 RS = %00100000
 
-PORTB_IO = %11111111
-PORTA_IO = %11100000
+PORTB_IO_MASK = %11111111
+PORTA_IO_MASK = %11100000
 
     .org $8000
 
 reset:
-    lda #PORTB_IO
+    ldx #$ff
+    txs
+
+    lda #PORTB_IO_MASK
     sta DDRB
 
-    lda #PORTA_IO
+    lda #PORTA_IO_MASK
     sta DDRA
 
     lda #%00000001
@@ -28,34 +31,38 @@ reset:
     lda #%00001111
     jsr lcd_instruction
 
-    lda #"S"
+    ldx #0
+print:
+    lda message,x
+    beq loop
     jsr print_char
+    inx
+    jmp print
 
-    lda #"t"
-    jsr print_char
-
-    lda #"r"
-    jsr print_char
-
-    lda #"a"
-    jsr print_char
-
-    lda #"h"
-    jsr print_char
-
-    lda #"i"
-    jsr print_char
-
-    lda #"n"
-    jsr print_char
-
-    lda #"j"
-    jsr print_char
-
-    lda #"a"
-    jsr print_char
 loop:
     jmp loop
+
+message: .asciiz "Hello, world!"
+
+lcd_wait:
+    pha
+    lda #%00000000  ; Port B is input
+    sta DDRB
+lcdbusy:
+    lda #RW
+    sta PORTA
+    lda #(RW | E)
+    sta PORTA
+    lda PORTB
+    and #%10000000
+    bne lcdbusy
+
+    lda #RW
+    sta PORTA
+    lda #%11111111  ; Port B is output
+    sta DDRB
+    pla
+    rts
 
 lcd_instruction:
     sta PORTB

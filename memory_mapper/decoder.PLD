@@ -1,0 +1,35 @@
+Name 6502 decoder ;
+PartNo 00 ;
+Date 12/23/2021 ;
+Revision 01 ;
+Designer Strahinja Marinkovic ;
+Company Strahinja Marinkovic ;
+Assembly None ;
+Location USA;
+Device g22v10 ;
+
+/* input pins */
+
+Pin 1 = PHI2;
+Pin 2 = RW;
+Pin [3..10] = [A15..A8];
+
+/* output pins */
+
+Pin 14 = OE;
+Pin 15 = WE;
+Pin 16 = RAM_CS;
+Pin 17 = ROM_CS;
+Pin 18 = DEVICES_CS;
+
+FIELD Address = [A15..A0];
+
+RAM = Address:[0000..7EFF];
+DEVICES = Address:[7F00..7FFF];
+ROM = Address:[8000..FFFF];
+
+!RAM_CS = RAM;
+!ROM_CS = ROM & RW;
+!DEVICES_CS = DEVICES;
+!WE = PHI2 & !RW;
+!OE = PHI2 & RW;
