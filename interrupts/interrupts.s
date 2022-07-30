@@ -1,10 +1,10 @@
-PORTB = $8000
-PORTA = $8001
-DDRB  = $8002
-DDRA  = $8003
-PCR   = $800c
-IFR   = $800d
-IER   = $800e
+PORTB = $7F00
+PORTA = $7F01
+DDRB  = $7F02
+DDRA  = $7F03
+PCR   = $7F0c
+IFR   = $7F0d
+IER   = $7F0e
 
 E  = %01000000
 RW = %00100000
@@ -24,18 +24,16 @@ counter = $020a ;2 bytes
 PORTB_IO_MASK = %11111111
 
     .org $8000
-    .word $0000    ;This will be here when the ROM will be from $9000-$FFFF
-    .org $9000
 reset:
-    ldx #$ff    ;Small delay so LCD can initialize itself
+    ldx #$ff    ;Set up stack pointer
     txs
-    cli
 
     lda #$82 ;Set CA1 enable for interrupts
     sta IER
 
-    lda #$00  ;Make CA1 be a active low edge
+    lda #$01  ;Make CA1 be a active low edge
     sta PCR
+    cli
 
     lda #PORTB_IO_MASK
     sta DDRB
@@ -118,8 +116,6 @@ print:
     jsr lcd_print
     inx
     jmp print
-
-number: .word 1729
 
 push_char:
     pha ;Push new character to stack

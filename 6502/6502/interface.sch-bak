@@ -613,8 +613,6 @@ Entry Wire Line
 	3100 3750 3200 3850
 Entry Wire Line
 	3100 3850 3200 3950
-Entry Wire Line
-	3100 3950 3200 4050
 Wire Wire Line
 	3200 3650 3550 3650
 Wire Wire Line
@@ -623,8 +621,6 @@ Wire Wire Line
 	3200 3850 3550 3850
 Wire Wire Line
 	3200 3950 3550 3950
-Wire Wire Line
-	3550 4050 3200 4050
 Text Label 3500 3650 2    50   ~ 0
 decode0
 Text Label 3500 3750 2    50   ~ 0
@@ -633,21 +629,8 @@ Text Label 3500 3850 2    50   ~ 0
 decode2
 Text Label 3500 3950 2    50   ~ 0
 decode3
-Text Label 3500 4050 2    50   ~ 0
-decode4
 Text GLabel 3100 3600 0    50   Input ~ 0
-decode[0..4]
-$Comp
-L Connector_Generic:Conn_01x05 J10
-U 1 1 6268FAB6
-P 3750 3850
-F 0 "J10" H 3830 3892 50  0000 L CNN
-F 1 "Conn_01x05" H 3830 3801 50  0000 L CNN
-F 2 "Connector_PinHeader_1.27mm:PinHeader_1x05_P1.27mm_Vertical" H 3750 3850 50  0001 C CNN
-F 3 "~" H 3750 3850 50  0001 C CNN
-	1    3750 3850
-	1    0    0    -1  
-$EndComp
+decode[0..3]
 $Comp
 L power:GND #PWR040
 U 1 1 626AC510
@@ -775,10 +758,6 @@ Text GLabel 6650 1650 0    50   Input ~ 0
 PS2_CLK
 Wire Wire Line
 	7250 1650 7300 1650
-Wire Wire Line
-	7650 1650 7650 1400
-Wire Wire Line
-	7650 1400 8150 1400
 $Comp
 L power:+5V #PWR042
 U 1 1 62724246
@@ -790,15 +769,6 @@ F 3 "" H 7850 1500 50  0001 C CNN
 	1    7850 1500
 	-1   0    0    1   
 $EndComp
-Wire Wire Line
-	9700 1400 9650 1400
-Wire Wire Line
-	9650 1400 9650 750 
-Wire Wire Line
-	9650 750  7650 750 
-Wire Wire Line
-	7650 750  7650 1400
-Connection ~ 7650 1400
 $Comp
 L Device:R R7
 U 1 1 6273740D
@@ -869,9 +839,6 @@ Wire Wire Line
 	8050 1700 8150 1700
 Wire Wire Line
 	7300 1650 7600 1650
-Connection ~ 7600 1650
-Wire Wire Line
-	7600 1650 7650 1650
 Wire Wire Line
 	8050 2300 8050 2550
 Wire Wire Line
@@ -968,10 +935,36 @@ F 3 "" H 10100 2300 50  0001 C CNN
 	1    10100 2300
 	1    0    0    -1  
 $EndComp
+$Comp
+L 74xx:74HC14 U11
+U 3 1 6232CC5F
+P 7200 1000
+F 0 "U11" H 7200 1317 50  0000 C CNN
+F 1 "74HC14" H 7200 1226 50  0000 C CNN
+F 2 "" H 7200 1000 50  0001 C CNN
+F 3 "http://www.ti.com/lit/gpn/sn74HC14" H 7200 1000 50  0001 C CNN
+	3    7200 1000
+	1    0    0    -1  
+$EndComp
+Text GLabel 6900 1000 0    50   Input ~ 0
+PS2_CLK
+Wire Wire Line
+	7500 1000 7500 1400
+Wire Wire Line
+	7500 1400 8150 1400
+Wire Wire Line
+	7500 1000 7500 750 
+Wire Wire Line
+	7500 750  9650 750 
+Wire Wire Line
+	9650 750  9650 1400
+Wire Wire Line
+	9650 1400 9700 1400
+Connection ~ 7500 1000
 Wire Bus Line
 	10850 700  10850 1400
 Wire Bus Line
-	3100 3550 3100 3950
+	3100 3550 3100 3850
 Wire Bus Line
 	950  2300 950  3000
 Wire Bus Line
@@ -984,4 +977,15 @@ Wire Bus Line
 	3200 700  3200 2200
 Wire Bus Line
 	950  3250 950  4750
+$Comp
+L Connector_Generic:Conn_01x04 J?
+U 1 1 63226BEA
+P 3750 3750
+F 0 "J?" H 3830 3742 50  0000 L CNN
+F 1 "Conn_01x04" H 3830 3651 50  0000 L CNN
+F 2 "" H 3750 3750 50  0001 C CNN
+F 3 "~" H 3750 3750 50  0001 C CNN
+	1    3750 3750
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
