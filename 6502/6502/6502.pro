@@ -1,4 +1,4 @@
-update=7/29/2022 11:01:51 PM
+update=8/1/2022 10:38:07 PM
 version=1
 last_client=kicad
 [general]
@@ -34,7 +34,7 @@ LibDir=
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
-PlotDirectoryName=
+PlotDirectoryName=C:/Users/stra2/OneDrive/Documents/6502/6502/6502/
 SubpartIdSeparator=0
 SubpartFirstId=65
 NetFmtName=Pcbnew
