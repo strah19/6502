@@ -27,5 +27,7 @@ To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -
 - <a href = "https://www.sparkfun.com/datasheets/LCD/HD44780.pdf"> HD44780 (20x4 LCD) </a>
 - <a href = "https://www.jameco.com/Jameco/Products/ProdDS/670442-DS01.pdf"> IRF4905 (MOSFET) </a>
 - <a href = "https://www.jameco.com/Jameco/Products/ProdDS/51262.pdf"> LM780 (5V Voltage Regulator) </a>
-- <a href = "https://www.jameco.com/Jameco/Products/ProdDS/46375.pdf"> DM74LS08 (AND Gates) </a>
+- <a href = "https://www.jameco.com/Jameco/Products/ProdDS/46375.pdf"> 74LS08 (AND Gates) </a>
 - <a href = "http://map.grauw.nl/resources/sound/texas_instruments_sn76489an.pdf"> SN76489AN (Sound Chip) </a>
+- <a href = "https://www.seattleu.edu/media/college-of-science-and-engineering/files/departments/electricalandcomputerengineering/74ls1545606.pdf"> 74LS154 (4 to 16 line decoder) </a>
+- <a href = "https://www.mouser.com/datasheet/2/268/doc0735-1369018.pdf"> Atmel ATF22V10C (Memory Mapper) </a>
