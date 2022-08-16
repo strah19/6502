@@ -1,5 +1,5 @@
 # 6502
-This 6502 homebrew computer was created to learn about computer architecture, assembly language, and electronics. This repository holds the assembly for the processor, references for developers, schematics, and PCBs for the project. All the chips and components for the main board can all be easily found and bought on websites such as Digikey, Mouser, or Jameco. However, to keep the design in line with the time period, some chips such as the sound and video chip (which will be on different boards) must be found on Ebay or an equivalent as they are no longer manufactured. The main board will have 4 expansion slots which will make it easy to add and modularize the computer.
+This 6502 homebrew computer was created to learn about computer architecture, assembly language, and electronics. This repository holds the assembly for the processor, references for developers, schematics, and PCBs for the project. All the chips and components for the main board can all be easily found and bought on websites such as Digikey, Mouser, or Jameco. However, to keep the design in line with the time period, some chips such as the sound and video chip (which will be on different boards) must be found on Ebay or an equivalent as they are no longer manufactured. The main board will have 4 expansion slots which will make it easy to add and modularize the computer. 
 
 # Memory Map
 | Address       | Devices |
@@ -12,6 +12,10 @@ This 6502 homebrew computer was created to learn about computer architecture, as
 
 # Build
 To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir file.s -o objectname`.
+
+# PCB
+The main PCB motherboard has a number of interfaces to make it easy to expand the computer. Firstly, the board has 4 expansion ports. Power input is 12V. There is also
+a Mini Din-6 for a PS2 keyboard. However, if the correct assembly code is used, a mouse could replace this or a mouse can be added through an expansion port if desired. There are also headers for access to the IO active address lines and extra bits from the VIA's which can be used. 
 
 # Notes
 - If the GAL chip is ever reprogrammed and the ROM, RAM, or VIA's ever get moved, the addresses in the assembly code will have to be edited for that code to work. 
