@@ -19,7 +19,7 @@ PORTB_IO_MASK = %11111111
 
     .org $8000
 reset:
-    ldx #$ff    ;Small delay so LCD can initialize itself
+    ldx #$ff    
     txs
 
     lda #PORTB_IO_MASK

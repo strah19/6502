@@ -1,3 +1,8 @@
+ACIA_DATA = $7F20
+ACIA_STATUS = $7F21
+ACIA_COMMAND = $7F22
+ACIA_CONTROL = $7F23
+
 PORTB = $7F00
 DDRB =  $7F02
 
@@ -13,13 +18,9 @@ INS_CURSOR = %00001111
 
 PORTB_IO_MASK = %11111111
 
-ACIA_DATA = $7F20
-ACIA_STATUS = $7F21
-ACIA_COMMAND = $7F22
-ACIA_CONTROL = $7F23
     .org $8000
 reset:
-    ldx #$ff    ;Small delay so LCD can initialize itself
+    ldx #$ff    
     txs
 
     lda #PORTB_IO_MASK
@@ -38,28 +39,23 @@ reset:
     lda #INS_CURSOR  ;Display on, cursor on, blink on
     jsr lcd_instruction
 
-    lda #%00001011          ;No parity, no echo, no interrupt
-    sta ACIA_COMMAND
-    lda #%00011111          ;1 stop bit, 8 data bits, 19200 baud
-    sta ACIA_CONTROL
+    lda #"a"
+    jsr lcd_print
 
-write:           ldx #0
-next_char:
-wait_txd_empty:  lda ACIA_STATUS
-                 and #$10
-                 beq wait_txd_empty
-                 lda text,x
-                 beq read
-                 sta ACIA_DATA
-                 jsr lcd_print
-                 inx
-                 jmp next_char
+    lda #%00001011				;No parity, no echo, no interrupt
+    sta ACIA_COMMAND
+    lda #%00011111				;1 stop bit, 8 data bits, 19200 baud
+    sta ACIA_CONTROL
+    lda #$00
+    sta ACIA_STATUS
 read:
-wait_rxd_full:	 lda ACIA_STATUS
-                 and #$08
-                 beq wait_rxd_full
-                 lda ACIA_DATA
-                 jmp write
+wait_rxd_full:	 
+    lda ACIA_STATUS
+    and #$08
+    beq wait_rxd_full
+    lda ACIA_DATA
+    jsr lcd_print
+    jmp read
 
 lcd_wait:
     pha ;Save our instruction
@@ -141,7 +137,6 @@ lcd_print:
     sta PORTB
     rts
 
-text:            .byte "Hello World!", $0d, $0a, $00
     .org $fffc
     .word reset   
     .word $0000
