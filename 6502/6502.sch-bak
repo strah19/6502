@@ -1673,7 +1673,7 @@ U 1 1 63CFD241
 P 1900 4600
 F 0 "U5" H 1900 5881 50  0000 C CNN
 F 1 "28C256" H 1900 5790 50  0000 C CNN
-F 2 "Package_DIP:DIP-28_W15.24mm_Socket" H 1900 4600 50  0001 C CNN
+F 2 "6502Computer:ZIF_Socket-28" H 1900 4600 50  0001 C CNN
 F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf" H 1900 4600 50  0001 C CNN
 	1    1900 4600
 	1    0    0    -1  
