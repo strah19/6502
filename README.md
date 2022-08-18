@@ -14,7 +14,11 @@ This 6502 homebrew computer was created to learn about computer architecture, as
 To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir file.s -o objectname`.
 
 # PCB
-The main PCB motherboard has a number of interfaces to make it easy to expand the computer. Firstly, the board has 4 expansion ports. Power input is 12V. There is also
+The main PCB motherboard has a number of interfaces to make it easy to expand the computer. Firstly, the board has 4 expansion ports with a pinout as follows:
+![Expansion Slot](https://github.com/strah19/6502/blob/master/docs/expansion.png?raw=true)
+
+
+Power input is 12V. There is also
 a Mini Din-6 for a PS2 keyboard. However, if the correct assembly code is used, a mouse could replace this or a mouse can be added through an expansion port if desired. There are also headers for access to the IO active address lines and extra bits from the VIA's which can be used. 
 
 # Notes
