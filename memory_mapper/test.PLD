@@ -1,6 +1,6 @@
 Name 6502 decoder ;
 PartNo 00 ;
-Date 12/23/2021 ;
+Date 8/23/2022 ;
 Revision 01 ;
 Designer Strahinja Marinkovic ;
 Company Strahinja Marinkovic ;
@@ -12,15 +12,16 @@ Device g22v10 ;
 
 Pin 1 = PHI2;
 Pin 2 = RW;
-Pin [3..10] = [A15..A8];
+Pin 3 = A15;
+Pin [5..11] = [A14..A8];
 
 /* output pins */
 
 Pin 14 = OE;
 Pin 15 = WE;
-Pin 16 = RAM_CS;
-Pin 17 = ROM_CS;
-Pin 18 = DEVICES_CS;
+Pin 16 = ROM_CS;
+Pin 17 = RAM_CS;
+Pin 21 = DEVICES_CS;
 
 FIELD Address = [A15..A0];
 

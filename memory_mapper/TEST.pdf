@@ -1,11 +1,11 @@
-{COMPONENT C:\USERS\STRA2\ONEDRIVE\DOCUMENTS\6502\MEMORY_MAPPER\DECODER.SYM
+{COMPONENT C:\USERS\STRA2\ONEDRIVE\DOCUMENTS\6502\TEST\TEST.SYM
 
  {ENVIRONMENT
   {PDIFvrev 3.00}
   {Program "CUPL(WM) Version 5.0a"}
   {DBtype "Schematic"}
   {DBvrev 1.01}
-  {DBtime "Thu Dec 23 22:00:14 2021 "}
+  {DBtime "Tue Aug 23 08:52:18 2022 "}
   {DBunit "MIL"}
   {DBgrid 10}
   {Lyrstr "WIRES" 1 "BUS" 1 "GATE" 2 "IEEE" 2 "PINFUN" 3 "PINNUM" 1 
@@ -45,8 +45,8 @@
    {P A8 {Pt "INPUT"}{Lq 0}{Ploc 100 20}}
    {P OE {Pt "I/O"}{Lq 0}{Ploc 320 20}}
    {P WE {Pt "I/O"}{Lq 0}{Ploc 320 40}}
-   {P RAM_CS {Pt "I/O"}{Lq 0}{Ploc 320 60}}
-   {P ROM_CS {Pt "I/O"}{Lq 0}{Ploc 320 80}}
+   {P ROM_CS {Pt "I/O"}{Lq 0}{Ploc 320 60}}
+   {P RAM_CS {Pt "I/O"}{Lq 0}{Ploc 320 80}}
    {P DEVICES_ {Pt "I/O"}{Lq 0}{Ploc 320 100}}
   }
 
@@ -75,7 +75,7 @@
    {Pnl 300 90}
    {Pnl 300 110}
 
-   {Sd A 1 2 3 4 5 6 7 8 9 10 14 15 16 17 18}
+   {Sd A 1 2 3 5 6 7 8 9 10 11 14 15 16 17 21}
   }
 
   {PIC
@@ -113,8 +113,8 @@
    [Tj "RC"]
    {T "OE" 280 20}
    {T "WE" 280 40}
-   {T "RAM_CS" 280 60}
-   {T "ROM_CS" 280 80}
+   {T "ROM_CS" 280 60}
+   {T "RAM_CS" 280 80}
    {T "DEVICES_" 280 100}
    [Ly "DEVICE"]
    [Tj "CT"]
@@ -129,7 +129,7 @@
    {EX
     [Ly "ATTR2"]
     [Ts 12][Tj "CT"][Tr 0][Tm "N"]
-    {At PLD C:\USERS\STRA2\ONEDRIVE\DOCUMENTS\6502\MEMORY_MAPPER\DECODER 210 240}
+    {At PLD C:\USERS\STRA2\ONEDRIVE\DOCUMENTS\6502\TEST\TEST 210 240}
    }
   }
  }
@@ -163,9 +163,9 @@
    }
    {N WE
    }
-   {N RAM_CS
-   }
    {N ROM_CS
+   }
+   {N RAM_CS
    }
    {N DEVICES_
    }
