@@ -13,6 +13,8 @@ This 6502 homebrew computer was created to learn about computer architecture, as
 # Build
 To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir file.s -o objectname`.
 
+To update the memory mapper, WinCUPL is needed for the PLD. The software is very easy to use. The current running memory mapper can be found in memory_mapper folder. Then, using a universal programmer, the code can be uploaded to the chip just like how it is done for the ROM. When editing the layout, the pin assignment cannot be changed (ex. pin 21 goes to devices no matter what) but what can be changed is what part of memory each device connected to the bus uses. Also, there are three extra output pins that can be programmed in for extra devices.
+
 # PCB
 The main PCB motherboard has a number of interfaces to make it easy to expand the computer. Firstly, the board has 4 expansion ports with a pinout as follows: <br/> <br/>
 ![Expansion Slot](https://github.com/strah19/6502/blob/master/docs/expansion.png?raw=true)
