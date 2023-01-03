@@ -5,9 +5,9 @@ This 6502 homebrew computer was created to learn about computer architecture, as
 | Address       | Devices |
 | ------------- | ------- | 
 | $0000 - $7EFF | RAM     | 
-| $7F00 - $7F01 | VIA 1   | 
-| $7F00 - $7F02 | VIA 2   | 
-| $7F03 - $7FFF | IO      | 
+| $7D00 - $7D0F | VIA 1   | 
+| $7E00 - $7E0F | VIA 2   | 
+| $7F00 - $7FFF | IO      | 
 | $8000 - $FFFF | ROM     | 
 
 # Build
@@ -27,6 +27,26 @@ a Mini Din-6 for a PS2 keyboard. However, if the correct assembly code is used, 
 # Notes
 - If the GAL chip is ever reprogrammed and the ROM, RAM, or VIA's ever get moved, the addresses in the assembly code will have to be edited for that code to work. 
 - The RAM is banked. This means that there are 16 possible memory blocks between $0000 and $7EFF. The banks are controlled by the first four bits in the first VIA on port A. If these do not get initialized, they will all be zero and the first bank will be enabled. This system gives nearly 512 KB of RAM.
+- <b/>The PCB Silkscreen that shows the labeling of the IO devices is incorrect. Here is a table of the translation: <b/>
+
+| Label IO       | Real IO |
+| -------------- | ------- | 
+|       IO0      |   IO12  | 
+|       IO1      |   IO13  | 
+|       IO2      |   IO14  | 
+|       IO3      |   IO15  | 
+|       IO4      |   IO0   | 
+|       IO5      |   IO1   | 
+|       IO6      |   IO2   | 
+|       IO7      |   IO3   | 
+|       IO8      |   IO4   | 
+|       IO9      |   IO5   | 
+|      IO10      |   IO6   | 
+|      IO11      |   IO7   | 
+|      IO12      |   IO8   | 
+|      IO13      |   IO9   | 
+|      IO14      |   IO10  | 
+|      IO15      |   IO11  |
 
 # Datasheets
 - <a href = "https://www.mouser.com/datasheet/2/436/w65c02s-2572.pdf"> W65C02 (MPU) </a>
