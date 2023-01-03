@@ -46,6 +46,13 @@ print:
     jmp print
 
 loop:
+    lda #%11111111
+    sta $7F00
+    sta $7F01
+    sta $7F10
+    sta $7F20
+    sta $7F20
+    sta $7F40
     jmp loop
 
 str: .asciiz "Hello Strahinja!"

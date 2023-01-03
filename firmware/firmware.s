@@ -5,6 +5,13 @@ E  = %01000000
 RW = %00100000
 RS = %00010000
 
+value = $0200 ; 2 bytes
+mod10 = $0202 ; 2 bytes
+message = $0204 ; 6 bytes
+
+position = $02D4
+lcd_read_data = $02D5
+
 INS_INIT   = %00000010
 INS_4BIT   = %00101000
 INS_CLEAR  = %00000001
@@ -20,8 +27,8 @@ DATA  = $20
 
 byte           =     $02D0             ; byte send/received
 parity         =     $02D1             ; parity holder for rx
-special        =     $02d2             ; ctrl, shift, caps and kb LED holder 
-lastbyte       =     $02d3             ; last byte received
+special        =     $02D2             ; ctrl, shift, caps and kb LED holder 
+lastbyte       =     $02D3             ; last byte received
 
 ; kbinput - wait for a key press and return with its assigned ASCII code in A.
 ; kbget   - wait for a key press and return with its unprocessed scancode in A.
@@ -39,6 +46,14 @@ reset:
     lda #PORTB_IO_MASK
     sta DDRB
 
+    lda #0
+    sta position
+
+    ; initiialize display twice since it is a 20x4 lcd
+    jsr lcd_init
+    lda #INS_4BIT ;4-bit mode, 5x8 font, 2 line
+    jsr lcd_instruction
+
     jsr lcd_init
     lda #INS_4BIT ;4-bit mode, 5x8 font, 2 line
     jsr lcd_instruction
@@ -54,35 +69,131 @@ reset:
 
     jsr kbinit
 
+   ; jsr lcd_read
+
+    lda number
+    sta value
+    lda number + 1
+    sta value + 1
+divide:
+    ; Initialize the remainder to zero
+    lda #0
+    sta mod10
+    sta mod10 + 1
+    clc
+
+    ldx #16
+
+divloop:
+    ; Rotate quotient and remainder
+    rol value
+    rol value + 1
+    rol mod10
+    rol mod10 + 1
+
+    ; a,y = dividend - devisor
+    sec
+    lda mod10
+    sbc #10
+    tay ; save low byte in Y
+    lda mod10+1
+    sbc #0
+    bcc ignore_result ; branch if dividend < devisor
+    sty mod10
+    sta mod10 + 1
+
+ignore_result:
+    dex
+    bne divloop
+    rol value ; shift in the last bit of the quotient
+    rol value + 1
+
+    lda mod10
+    clc
+    adc #"0"
+    jsr  push_char
+
+    ; if value != 0, then continue dividing
+    lda value
+    ora value + 1
+    bne divide ; branch if value not equal to 0
+
+    ldx #0    
+print:
+    lda message,x
+    beq loop
+    jsr lcd_print
+    inx
+    jmp print
+
 loop:
     jsr kbinput
     cmp #$1b
     beq esc_pressed
     cmp #$08
     beq backspace_pressed
-    cmp #$0d           ; enter - go to second line
-    beq enter_pressed
+;    cmp #$0d           ; enter - go to second line
+;    beq enter_pressed
     jsr lcd_print
-    jmp loop   
 
+    clc
+    lda position
+    adc #01
+    sta position
+
+;    jsr lcd_read
+  ;  cmp #$14
+  ;  beq newline1
+
+  ;  lda position
+   ; cmp #$28
+  ;  beq newline2
+   
+  ;  lda position
+   ; cmp #$3C
+  ;  beq newline3
+
+    jmp loop   
+number: .word 1729
+
+newline1:
+    lda #%10101000
+    jsr lcd_instruction
+    jmp loop
+newline2:
+    lda #%10010100
+    jsr lcd_instruction
+    jmp loop 
+newline3:
+    lda #%10111100
+    jsr lcd_instruction
+    jmp loop         
 esc_pressed:
     lda #INS_CLEAR
     jsr lcd_instruction
+    lda #0
+    sta position
     jmp loop   
 
 backspace_pressed:
+    lda position
+    beq loop
     lda #%00010000
     jsr lcd_instruction
     lda #" "
     jsr lcd_print
     lda #%00010000
     jsr lcd_instruction
+    sec
+    lda position
+    sbc #01
+    sta position
     jmp loop
 
-enter_pressed:
-    lda #%10101000 ; put cursor at position 40
-    jsr lcd_instruction
-    jmp loop
+;enter_pressed:
+;    lda #%10101000 ; put cursor at position 40
+;    jsr lcd_instruction
+;    jmp loop
 
 kbreinit:       
     jsr   kbinit 
@@ -511,6 +622,24 @@ kbhl1:
     and   #DATA             ; get DATA line state
     rts 
 
+push_char:
+    pha ; Push new first char onto stack
+    ldy #0
+
+char_loop:
+    lda message,y ; Get char on the string and put into X
+    tax
+    pla
+    sta message,y ; Pull char off stack and add it to the string
+    iny
+    txa
+    pha           ; Push char from string onto stack
+    bne char_loop
+
+    pla
+    sta message,y ; Pull the null off the stack and add to the end of the string
+
+    rts
 lcd_wait:
     pha ;Save our instruction
     lda #%11110000  ;We want to read the lower nibble and make sure the busy flag is not high
@@ -539,6 +668,40 @@ lcd_busy:
     lda #PORTB_IO_MASK  ;Sets them back to output
     sta DDRB
     pla ;Get back the initial instruction
+    rts
+lcd_read:
+    lda #%11110000  ;We want to read the lower nibble and make sure the busy flag is not high
+    sta DDRB    ;Change directions
+
+    lda #RW ;Set the r/w pin
+    sta PORTB
+    ora #E ;Also then set the enable
+    sta PORTB
+    lda PORTB ;This has the busy flag
+
+    asl
+    asl
+    asl
+    asl
+
+    pha ;This has the higher nibble
+
+    lda #RW ;Set the r/w pin
+    sta PORTB
+    ora #E ;Also then set the enable
+    sta PORTB
+    lda PORTB ;This is the lower nibble, we don't actually need this because it has the address counter but is necessary to finish getting all 8 bits
+    plx
+    stx lcd_read_data
+    ora lcd_read_data
+
+    pha
+
+    lda #0
+    sta PORTB
+    lda #PORTB_IO_MASK  ;Sets them back to output
+    sta DDRB
+    pla
     rts
 lcd_instruction:
     jsr lcd_wait
