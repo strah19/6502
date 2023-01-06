@@ -14,8 +14,6 @@ INS_CURSOR = %00001111
 PORTB_IO_MASK = %11111111
 
     .org $8000
-    ;.word $0000    ;This will be here when the ROM will be from $9000-$FFFF
-    ;.org $9000
 reset:
     ldx #$ff    ;Small delay so LCD can initialize itself
     txs
@@ -46,13 +44,6 @@ print:
     jmp print
 
 loop:
-    lda #%11111111
-    sta $7F00
-    sta $7F01
-    sta $7F10
-    sta $7F20
-    sta $7F20
-    sta $7F40
     jmp loop
 
 str: .asciiz "Hello Strahinja!"
