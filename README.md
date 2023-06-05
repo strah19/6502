@@ -11,7 +11,7 @@ This 6502 homebrew computer was created to learn about computer architecture, as
 | $8000 - $FFFF | ROM     | 
 
 # Build
-To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir file.s -o objectname`.
+To run vasm, the 6502 assembler, the command is `.\vasm6502_oldstyle.exe -Fbin -dotdir -wdc02 file.s -o objectname`.
 
 To update the memory mapper, WinCUPL is needed for the PLD. The software is very easy to use. The current running memory mapper can be found in memory_mapper folder. Then, using a universal programmer, the code can be uploaded to the chip just like how it is done for the ROM. When editing the layout, the pin assignment cannot be changed (ex. pin 21 goes to devices no matter what) but what can be changed is what part of memory each device connected to the bus uses. Also, there are three extra output pins that can be programmed in for extra devices.
 
@@ -47,6 +47,7 @@ a Mini Din-6 for a PS2 keyboard. However, if the correct assembly code is used, 
 |      IO13      |   IO9   | 
 |      IO14      |   IO10  | 
 |      IO15      |   IO11  |
+- Never assume that the assembly has been compiled even if there is output file. 
 
 # Datasheets
 - <a href = "https://www.mouser.com/datasheet/2/436/w65c02s-2572.pdf"> W65C02 (MPU) </a>

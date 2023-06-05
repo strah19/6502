@@ -1,10 +1,10 @@
-ACIA_DATA = $7F20
-ACIA_STATUS = $7F21
-ACIA_COMMAND = $7F22
-ACIA_CONTROL = $7F23
+ACIA_DATA = $7F00
+ACIA_STATUS = $7F01
+ACIA_COMMAND = $7F02
+ACIA_CONTROL = $7F03
 
-PORTB = $7F00
-DDRB =  $7F02
+PORTB = $7D00
+DDRB =  $7D02
 
 E  = %01000000
 RW = %00100000
@@ -42,20 +42,53 @@ reset:
     lda #"a"
     jsr lcd_print
 
-    lda #%00001011				;No parity, no echo, no interrupt
-    sta ACIA_COMMAND
-    lda #%00011111				;1 stop bit, 8 data bits, 19200 baud
-    sta ACIA_CONTROL
     lda #$00
-    sta ACIA_STATUS
-read:
+    sta ACIA_STATUS             ;Soft reset
+
+    lda #$0b				;No parity, no echo, no interrupt
+    sta ACIA_COMMAND
+
+    lda #$1f				;1 stop bit, 8 data bits, 19200 baud
+    sta ACIA_CONTROL
+
+    ldx #0
+send_msg:
+    lda message, x
+    beq done
+    jsr send_char
+    inx
+    jmp send_msg
+done:
+
 wait_rxd_full:	 
     lda ACIA_STATUS
     and #$08
     beq wait_rxd_full
     lda ACIA_DATA
     jsr lcd_print
-    jmp read
+    jmp wait_rxd_full
+
+message: .asciiz "Hello World"
+
+send_char:
+    lda ACIA_DATA
+    pha
+wait_txd_full:
+    lda ACIA_STATUS
+    and #$10
+    beq wait_txd_full
+    jsr tx_wait
+    pla
+    rts    
+
+tx_wait:
+    phx
+    ldx #100
+tx_wait1:
+    dex
+    bne tx_wait1
+    plx
+    rts
 
 lcd_wait:
     pha ;Save our instruction
