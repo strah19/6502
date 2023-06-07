@@ -65,13 +65,14 @@ wait_rxd_full:
     and #$08
     beq wait_rxd_full
     lda ACIA_DATA
+    jsr send_char
     jsr lcd_print
     jmp wait_rxd_full
 
 message: .asciiz "Hello World"
 
 send_char:
-    lda ACIA_DATA
+    sta ACIA_DATA
     pha
 wait_txd_full:
     lda ACIA_STATUS
