@@ -1009,6 +1009,17 @@
     (uuid fb31f6ee-5ac6-41d0-9bbd-26fa77dbda5c)
   )
 
+  (rectangle (start 26.67 60.96) (end 217.17 142.24)
+    (stroke (width 0) (type default))
+    (fill (type none))
+    (uuid 69fa865c-85d1-4da5-817a-84870eb928e9)
+  )
+
+  (text "Serial Communication Circuit" (at 109.22 64.77 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 5e51b891-5f6d-4d51-a700-37bcd1a2b5aa)
+  )
+
   (label "d0" (at 100.33 106.68 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 25e6a85b-3f29-4123-9ff7-2f08b488ea42)

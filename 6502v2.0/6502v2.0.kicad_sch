@@ -7008,7 +7008,7 @@
     (property "Reference" "#PWR015" (at 97.79 25.4 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (property "Value" "+5V" (at 98.171 17.1958 0)
+    (property "Value" "+5V" (at 97.79 17.78 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "" (at 97.79 21.59 0)
