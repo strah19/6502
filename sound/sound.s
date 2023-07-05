@@ -12,6 +12,11 @@ DDRB =  $7D02
 PORTA2 = $7E01
 DDRA2  =  $7E03
 
+T1CL = $7D04
+T1CH = $7D05
+ACR = $7D0B
+IFR = $7D0E
+
 E  = %01000000
 RW = %00100000
 RS = %00010000
@@ -21,8 +26,6 @@ INS_4BIT = %00101000
 INS_CLEAR = %00000001
 INS_RETURN = %00000010
 INS_CURSOR = %00001111
-
-PSG_ADDRESS_CNTRL = $7F00
 
 A_FINE_TONE = %0000
 A_COURSE_TONE = %0001
@@ -52,6 +55,10 @@ reset:
     lda #PORTA2_IO_MASK
     sta DDRA2
 
+    ; Timer initialization
+    lda #0
+    sta ACR
+
     jsr lcd_init
     lda #INS_4BIT ;4-bit mode, 5x8 font, 2 line
     jsr lcd_instruction
@@ -68,7 +75,7 @@ reset:
     ; Load frequency for Channel A into its fine tone register
     lda #A_FINE_TONE
     jsr latch_address
-    lda #194
+    lda #6
     jsr write
 
     ; Load frequency for Channel A into its coarse tone register
@@ -90,6 +97,9 @@ reset:
 
     lda #"/"
     jsr lcd_print
+
+    lda #%10000000
+    sta PORTB
 
 loop:
     jmp loop
@@ -208,6 +218,18 @@ lcd_print:
     sta PORTB
     eor #E
     sta PORTB
+    rts
+
+delay:
+    ; Loading $9C40 will cause a 10 ms timer delay with a 4 Mhz clock
+    lda #$40
+    sta T1CL
+    lda #$9C
+    sta T1CH
+delay_loop:
+    bit IFR
+    bvc delay_loop
+    lda T1CL
     rts
 
     .org $fffc
