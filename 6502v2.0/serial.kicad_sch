@@ -1468,7 +1468,7 @@
     (property "Value" "MAX232" (at 151.8794 71.12 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "" (at 151.13 125.73 0)
+    (property "Footprint" "Package_DIP:DIP-16_W7.62mm_Socket" (at 151.13 125.73 0)
       (effects (font (size 1.27 1.27)) (justify left) hide)
     )
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/max232.pdf" (at 149.86 96.52 0)
