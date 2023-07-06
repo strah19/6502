@@ -1,21 +1,22 @@
-; The AY-3-8910 uses a little different type of architecture. This chip takes no space up in memory, in the traditional sense.
-; Instead, it uses control signals, BDIR and BC1, to tell the chip if it is inactive, reading, writing, or latching an address.
-; Then, it turns it bus "on" when the correct control signals have been set. The PSG_ADDRESS_CNTRL address is only there to make
-; sure that the data on the bus is not going into other places like RAM or other IO and is not interruptting anything else.
-
 PORTA = $7D01
-DDRA =  $7D03
-
 PORTB = $7D00
+
+; Direction registers
+DDRA =  $7D03
 DDRB =  $7D02
 
-PORTA2 = $7E01
-DDRA2  =  $7E03
-
+; Timer registers
 T1CL = $7D04
 T1CH = $7D05
+
+; Status & Flag registers
 ACR = $7D0B
-IFR = $7D0E
+IFR = $7D0D
+IER = $7D0E
+
+; VIA #2
+PORTA2 = $7E01
+DDRA2  =  $7E03
 
 E  = %01000000
 RW = %00100000
@@ -41,6 +42,8 @@ PORTA_IO_MASK = %11111111
 PORTB_IO_MASK = %11111111
 PORTA2_IO_MASK = %11111111
 
+ticks = $0000
+
     .org $8000
 reset:
     ldx #$ff
@@ -56,8 +59,7 @@ reset:
     sta DDRA2
 
     ; Timer initialization
-    lda #0
-    sta ACR
+    jsr timer_init
 
     jsr lcd_init
     lda #INS_4BIT ;4-bit mode, 5x8 font, 2 line
@@ -220,19 +222,37 @@ lcd_print:
     sta PORTB
     rts
 
-delay:
-    ; Loading $9C40 will cause a 10 ms timer delay with a 4 Mhz clock
-    lda #$40
+timer_init:
+    lda #0
+    sta ticks
+    sta ticks + 1
+    sta ticks + 2
+    sta ticks + 3
+
+    lda #%01000000
+    sta ACR
+    lda #$3E
     sta T1CL
     lda #$9C
-    sta T1CH
-delay_loop:
-    bit IFR
-    bvc delay_loop
-    lda T1CL
+    sta T1HC
+    lda #%11000000
+    sta IER
+    cli
     rts
+
+irq:
+    bit T1CL
+    inc ticks
+    bne irq_exit
+    inc ticks + 1
+    bne irq_exit
+    inc ticks + 2
+    bne irq_exit
+    inc ticks + 3
+irq_exit:
+    rti
 
     .org $fffc
     .word reset
-    .word $0000
+    .word irq
 

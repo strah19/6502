@@ -38,7 +38,7 @@ HIGH_FREQ = 20000
 
 clock = float(input("Enter clock speed in MHz: "))
 clock = clock * 1e6
-file = open("frequency_table.txt", "w")
+file = open("frequency_table{0}MHz.txt".format(clock), "w")
 file.write("frequency table\n")
 file.write("clock speed = {0}\n".format(clock))
 
