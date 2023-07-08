@@ -44,7 +44,7 @@ PORTA2_IO_MASK = %11111111
 
 ticks = $0000
 
-    .org $8000
+    .byt $8000
 reset:
     ldx #$ff
     txs
@@ -234,7 +234,7 @@ timer_init:
     lda #$3E
     sta T1CL
     lda #$9C
-    sta T1HC
+    sta T1CH
     lda #%11000000
     sta IER
     cli
