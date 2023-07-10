@@ -44,7 +44,7 @@ PORTA2_IO_MASK = %11111111
 
 ticks = $0000
 
-    .byt $8000
+*=$8000
 reset:
     ldx #$ff
     txs
@@ -252,7 +252,12 @@ irq:
 irq_exit:
     rti
 
-    .org $fffc
+end_of_program
+
+    *=$FFFC
+    .dsb (*-end_of_program), 0
+    *=$FFFC
+
     .word reset
     .word irq
 
