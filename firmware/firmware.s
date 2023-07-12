@@ -20,14 +20,16 @@ reset:
     jsr lcd_print
 
 irq:
+nmi:
     rti
 
 program_end
 
-    *=$FFFC
+    *=$FFFA
     .dsb (*-program_end), 0
-    *=$FFFC
+    *=$FFFA
 
+    .word nmi
     .word reset
     .word irq
 
