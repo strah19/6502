@@ -247,7 +247,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "6502v2.0.kicad_pro",
+    "filename": "VideoCard.kicad_pro",
     "version": 1
   },
   "net_settings": {
@@ -312,18 +312,8 @@
       "version": 1
     },
     "net_format_name": "",
-    "ngspice": {
-      "fix_include_paths": true,
-      "fix_passive_vals": false,
-      "meta": {
-        "version": 0
-      },
-      "model_mode": 0,
-      "workbook_filename": ""
-    },
     "page_layout_descr_file": "",
-    "plot_directory": "./",
-    "spice_adjust_passive_values": false,
+    "plot_directory": "",
     "spice_current_sheet_as_root": false,
     "spice_external_command": "spice \"%I\"",
     "spice_model_current_sheet_as_root": true,
@@ -334,20 +324,8 @@
   },
   "sheets": [
     [
-      "5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8",
+      "f8a7908b-1bb4-4fe4-9307-88b0355e80ee",
       ""
-    ],
-    [
-      "1b4f2a30-968c-439a-9b3a-11a254213628",
-      "interface"
-    ],
-    [
-      "8c57531e-8fe8-45bf-98a2-c0e7008056b5",
-      "serial"
-    ],
-    [
-      "99446e73-4cf8-4cf8-b0e5-2db38fecee4d",
-      "audio"
     ]
   ],
   "text_variables": {}
