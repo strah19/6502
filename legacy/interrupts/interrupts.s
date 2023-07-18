@@ -1,27 +1,39 @@
-ACIA_DATA = $7F00
-ACIA_STATUS = $7F01
-ACIA_COMMAND = $7F02
-ACIA_CONTROL = $7F03
-
 PORTB = $7D00
-DDRB =  $7D02
+PORTA = $7D01
+DDRB  = $7D02
+DDRA  = $7D03
+PCR   = $7D0c
+IFR   = $7D0d
+IER   = $7D0e
 
 E  = %01000000
 RW = %00100000
 RS = %00010000
 
-INS_INIT = %00000010
-INS_4BIT = %00101000
-INS_CLEAR = %00000001
+INS_INIT   = %00000010
+INS_4BIT   = %00101000
+INS_CLEAR  = %00000001
 INS_RETURN = %00000010
-INS_CURSOR = %00001111
+INS_CURSOR = %00001110
+
+value = $0200
+mod10 = $0202   ;Each is two bytes
+message = $0204 ;Up to 6 bytes
+counter = $020a ;2 bytes
 
 PORTB_IO_MASK = %11111111
 
     .org $8000
 reset:
-    ldx #$ff    
+    ldx #$ff    ;Set up stack pointer
     txs
+
+    lda #$82 ;Set CA1 enable for interrupts
+    sta IER
+
+    lda #$01  ;Make CA1 be a active low edge
+    sta PCR
+    cli
 
     lda #PORTB_IO_MASK
     sta DDRB
@@ -39,56 +51,87 @@ reset:
     lda #INS_CURSOR  ;Display on, cursor on, blink on
     jsr lcd_instruction
 
-    lda #"a"
-    jsr lcd_print
+    lda #0
+    sta counter
+    sta counter + 1
+p_loop:
+    lda #INS_RETURN  ;Clear display
+    jsr lcd_instruction
 
-    lda #$00
-    sta ACIA_STATUS             ;Soft reset
+    lda #0
+    sta message ;Null terminating string
 
-    lda #$0b				;No parity, no echo, no interrupt
-    sta ACIA_COMMAND
+    ;Store the number (both bytes) in the a register
+    sei
+    lda counter
+    sta value
+    lda counter + 1
+    sta value + 1
+    cli
+divide:
+    ;Set the remainder to 0
+    lda #0
+    sta mod10
+    sta mod10 + 1
 
-    lda #$1f				;1 stop bit, 8 data bits, 19200 baud
-    sta ACIA_CONTROL
+    clc ;Clear carry
+    ldx #16
+divloop:
+    ;Will rotate 1 bit to the left 
+    rol value
+    rol value + 1
+    rol mod10
+    rol mod10 + 1
+
+    ;a and y have the answer
+    sec
+    lda mod10
+    sbc #10
+    tay ;Save low byte
+    lda mod10 + 1
+    sbc #0
+
+    bcc ignore_result   ;Branch will dividend < divisor
+    sty mod10
+    sta mod10 + 1
+ignore_result:
+    dex
+    bne divloop
+    rol value   ;Get the carry bit
+    rol value + 1
+
+    lda mod10
+    clc
+    adc #"0"
+    jsr push_char
+
+    lda value
+    ora value + 1
+    bne divide
 
     ldx #0
-send_msg:
-    lda message, x
-    beq done
-    jsr send_char
-    inx
-    jmp send_msg
-done:
-
-wait_rxd_full:	 
-    lda ACIA_STATUS
-    and #$08
-    beq wait_rxd_full
-    lda ACIA_DATA
-    jsr send_char
+print:
+    lda message,x
+    beq p_loop
     jsr lcd_print
-    jmp wait_rxd_full
+    inx
+    jmp print
 
-message: .asciiz "Hello World"
-
-send_char:
-    sta ACIA_DATA
-    pha
-wait_txd_full:
-    lda ACIA_STATUS
-    and #$10
-    beq wait_txd_full
-    jsr tx_wait
+push_char:
+    pha ;Push new character to stack
+    ldy #0
+char_loop:
+    lda message, y  ;Get character from message and load into x
+    tax
     pla
-    rts    
+    sta message, y  ;Put new character onto string
+    iny
+    txa
+    pha
+    bne char_loop
 
-tx_wait:
-    phx
-    ldx #100
-tx_wait1:
-    dex
-    bne tx_wait1
-    plx
+    pla
+    sta message, y  ;Put null back at end
     rts
 
 lcd_wait:
@@ -171,6 +214,16 @@ lcd_print:
     sta PORTB
     rts
 
-    .org $fffc
-    .word reset   
-    .word $0000
+irq:
+nmi:
+    inc counter
+    bne exit_irq
+    inc counter + 1
+exit_irq:
+    bit PORTA
+    rti
+
+    .org $fffa
+    .word nmi
+    .word reset
+    .word irq

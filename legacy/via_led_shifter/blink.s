@@ -2,13 +2,13 @@
 
 reset:
     lda #$ff
-    sta $6002
+    sta $FD02
 
     lda #$50
-    sta $6000
+    sta $7D00
 loop:
     ror
-    sta $6000
+    sta $7D00
 
     jmp loop
 

@@ -1,8 +1,7 @@
-CLK_CENTURY = $7F10
-CLK_SECONDS = $7F11
-CLK_MINUTE = $7F12
-CLK_HOUR = $7F13
-CLK_DAY = $7F14
+ACIA_DATA = $7F00
+ACIA_STATUS = $7F01
+ACIA_COMMAND = $7F02
+ACIA_CONTROL = $7F03
 
 PORTB = $7D00
 DDRB =  $7D02
@@ -40,14 +39,57 @@ reset:
     lda #INS_CURSOR  ;Display on, cursor on, blink on
     jsr lcd_instruction
 
-    lda CLK_SECONDS
-    and #%10000000
-    rol
-    rol
-    adc #$30
+    lda #"a"
     jsr lcd_print
-loop:
-    jmp loop
+
+    lda #$00
+    sta ACIA_STATUS             ;Soft reset
+
+    lda #$0b				;No parity, no echo, no interrupt
+    sta ACIA_COMMAND
+
+    lda #$1f				;1 stop bit, 8 data bits, 19200 baud
+    sta ACIA_CONTROL
+
+    ldx #0
+send_msg:
+    lda message, x
+    beq done
+    jsr send_char
+    inx
+    jmp send_msg
+done:
+
+wait_rxd_full:	 
+    lda ACIA_STATUS
+    and #$08
+    beq wait_rxd_full
+    lda ACIA_DATA
+    jsr send_char
+    jsr lcd_print
+    jmp wait_rxd_full
+
+message: .asciiz "Hello World"
+
+send_char:
+    sta ACIA_DATA
+    pha
+wait_txd_full:
+    lda ACIA_STATUS
+    and #$10
+    beq wait_txd_full
+    jsr tx_wait
+    pla
+    rts    
+
+tx_wait:
+    phx
+    ldx #25
+tx_wait1:
+    dex
+    bne tx_wait1
+    plx
+    rts
 
 lcd_wait:
     pha ;Save our instruction
