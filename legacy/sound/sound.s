@@ -1,6 +1,9 @@
 PORTA = $7D01
 PORTB = $7D00
 
+LATCH_REG = $7F10
+WRITE_REG = $7F11
+
 ; Direction registers
 DDRA =  $7D03
 DDRB =  $7D02
@@ -76,26 +79,26 @@ reset:
 
     ; Load frequency for Channel A into its fine tone register
     lda #A_FINE_TONE
-    jsr latch_address
+    sta LATCH_REG
     lda #6
-    jsr write
+    sta WRITE_REG
 
     ; Load frequency for Channel A into its coarse tone register
     lda #A_COURSE_TONE
-    jsr latch_address
+    sta LATCH_REG
     lda #1
-    jsr write
+    sta WRITE_REG
 
     ; Sets the noise and tone controls
     lda #MIXER_CONTROL
-    jsr latch_address
+    sta LATCH_REG
     lda #%11111110      ; This will make only Channel A active
-    jsr write 
+    sta WRITE_REG
 
     lda #A_AMP
-    jsr latch_address
+    sta LATCH_REG
     lda #%00001111      ; This will set channel A to its highest amplitude
-    jsr write
+    sta WRITE_REG
 
     lda #"/"
     jsr lcd_print
@@ -252,12 +255,7 @@ irq:
 irq_exit:
     rti
 
-end_of_program
-
-    *=$FFFC
-    .dsb (*-end_of_program), 0
-    *=$FFFC
-
+    .org $fffc
     .word reset
     .word irq
 
