@@ -1458,7 +1458,7 @@
   (symbol (lib_id "Connector:DB9_Female") (at 207.01 111.76 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 599354d8-3a5c-4dd7-afdb-961a04d255ac)
-    (property "Reference" "J11" (at 212.09 110.4899 0)
+    (property "Reference" "J12" (at 212.09 110.4899 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
     (property "Value" "DB9_Female" (at 212.09 113.0299 0)
@@ -1482,7 +1482,7 @@
     (instances
       (project "6502v2.0"
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/8c57531e-8fe8-45bf-98a2-c0e7008056b5"
-          (reference "J11") (unit 1)
+          (reference "J12") (unit 1)
         )
       )
     )
