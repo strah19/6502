@@ -109,42 +109,6 @@ reset:
 loop:
     jmp loop
 
-latch_address:
-    pha     ; Store A on stack
-
-    lda #%00000000      
-    sta PORTA       ; Before a latch, we will make sure set the function to inactive
-
-    lda #%11000000      ; This will set BDIR & BC1 to high which is the control for latching
-    sta PORTA
-
-    pla     ; Get the address from A
-    sta PORTA2     ; The address does not really matter, we just need to load the address onto the bus and make sure A9B is active (which occures at this address)
-
-    ; Need to set function to inactive again
-    lda #0      
-    sta PORTA       ; Before a latch, we will make sure set the function to inactive
-
-    rts     ; Return
-
-write:
-    pha
-
-    lda #0      
-    sta PORTA       ; Before a latch, we will make sure set the function to inactive
-
-    lda #%01000000  ;This will set the BDIR & BC1 correctly for writing to PSG
-    sta PORTA
-
-    pla     ; Get the data from A
-    sta PORTA2   ; Again, address does not matter but we are using this control address so we aren't writing data to random places
-
-    ; Need to set function to inactive again
-    lda #0      
-    sta PORTA       ; Before a latch, we will make sure set the function to inactive    
-
-    rts     ; Return
-
 lcd_wait:
     pha ;Save our instruction
     lda #%11110000  ;We want to read the lower nibble and make sure the busy flag is not high

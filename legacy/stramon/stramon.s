@@ -181,7 +181,7 @@ PRHEX:
 ECHO:
                 PHA                    ; Save A.
                 STA     ACIA_DATA      ; Output character.
-                LDA     #$FF           ; Initialize delay loop.
+                LDA     #$ed           ; Initialize delay loop.
 TXDELAY:        DEC                    ; Decrement A.
                 BNE     TXDELAY        ; Until A gets to 0.
                 PLA                    ; Restore A.
