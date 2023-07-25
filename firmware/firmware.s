@@ -7,6 +7,7 @@
     *=$8000
 
 #include "lcd.s"
+#include "keyboard.s"
 
 reset:
     ; initializes stack
@@ -18,6 +19,13 @@ reset:
 
     lda #"/"
     jsr lcd_print
+
+    jsr kbinit
+
+loop:
+    jsr kbinput
+    jsr lcd_print
+    jmp loop
 
 irq:
 nmi:

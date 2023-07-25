@@ -17,87 +17,130 @@ INS_CLEAR = %00000001
 INS_RETURN = %00000010
 INS_CURSOR = %00001111
 
+lcd_position = $06D4
+
 lcd_wait:
-    pha ;Save our instruction
-    lda #%11110000  ;We want to read the lower nibble and make sure the busy flag is not high
-    sta DDRB    ;Change directions
-lcd_busy:
-    lda #RW ;Set the r/w pin
-    sta PORTB
-    ora #E ;Also then set the enable
-    sta PORTB
-    lda PORTB ;This has the busy flag
-
-    pha ;This has the higher nibble
-
-    lda #RW ;Set the r/w pin
-    sta PORTB
-    ora #E ;Also then set the enable
-    sta PORTB
-    lda PORTB ;This is the lower nibble, we don't actually need this because it has the address counter but is necessary to finish getting all 8 bits
-    pla ;Get back the busy flag
-    and #%00001000  ;Get just the busy flag
-
-    bne lcd_busy    ;If it is true, go back to the lcd_busy label
-
-    lda #0
-    sta PORTB
-    lda #PORTB_IO_MASK  ;Sets them back to output
+    pha
+    lda #%11110000  ; LCD data is input
     sta DDRB
-    pla ;Get back the initial instruction
+lcdbusy:
+    lda #RW
+    sta PORTB
+    lda #(RW | E)
+    sta PORTB
+    lda PORTB       ; Read high nibble
+    pha             ; and put on stack since it has the busy flag
+    lda #RW
+    sta PORTB
+    lda #(RW | E)
+    sta PORTB
+    lda PORTB       ; Read low nibble
+    pla             ; Get high nibble off stack
+    and #%00001000
+    bne lcdbusy
+
+    lda #RW
+    sta PORTB
+    lda #%11111111  ; LCD data is output
+    sta DDRB
+    pla
     rts
-lcd_instruction:
-    jsr lcd_wait
-    pha ;Save the accumulator to the stack
-    lsr ;Shift over 4 bits because the LCD first needs the upper nibble of our instruction
-    lsr
-    lsr
-    lsr
-    sta PORTB   ;Send to VIA
-    ora #E  ;Set enable pin
+
+lcd_read_address:
+    pha
+    phx
+    lda #%11110000  ; LCD data is input
+    sta DDRB
+lcd_read:
+    lda #RW
     sta PORTB
-    eor #E  ;Clear enable
+    lda #(RW | E)
     sta PORTB
-    pla ;Get back our initial instruction
-    and #%00001111  ;Only care about the lowwer nibble now to send
-    sta PORTB   ;Send to VIA
-    ora #E  ;Set enable pin
+    lda PORTB       ; Read high nibble
+    pha             ; and put on stack since it has the busy flag
+    lda #RW
     sta PORTB
-    eor #E  ;Clear enable
+    lda #(RW | E)
     sta PORTB
+    pla 
+    
+    and #%00001000
+    bne lcd_read
+
+    lda #RW
+    sta PORTB
+    lda #%11111111  ; LCD data is output
+    sta DDRB
+    pla
     rts
+
 lcd_init:
-  lda #INS_INIT ; Set 4-bit mode
-  sta PORTB
-  ora #E
-  sta PORTB
-  and #%00001111
-  sta PORTB
-  rts
-lcd_print:
-    jsr lcd_wait
-    pha ;Save data
-    lsr ;Get high nibble first
-    lsr
-    lsr
-    lsr
-    ora #RS ;Set RS
-    sta PORTB
-    ora #E  ;Set enable
-    sta PORTB
-    eor #E  ;Clear enable
-    sta PORTB
-    pla ;Get lower nibble
-    and #%00001111  ;Make sure its just the char
-    ora #RS
+    lda #%00000010 ; Set 4-bit mode
     sta PORTB
     ora #E
     sta PORTB
-    eor #E
+    and #%00001111
+    sta PORTB
+    jsr lcd_wait
+    rts
+
+lcd_instruction:
+    jsr lcd_wait
+    pha
+    lsr
+    lsr
+    lsr
+    lsr            ; Send high 4 bits
+    sta PORTB
+    ora #E         ; Set E bit to send instruction
+    sta PORTB
+    eor #E         ; Clear E bit
+    sta PORTB
+    pla
+    and #%00001111 ; Send low 4 bits
+    sta PORTB
+    ora #E         ; Set E bit to send instruction
+    sta PORTB
+    eor #E         ; Clear E bit
     sta PORTB
     rts
 
+lcd_print:
+    jsr lcd_wait
+    pha
+    lsr
+    lsr
+    lsr
+    lsr             ; Send high 4 bits
+    ora #RS         ; Set RS
+    sta PORTB
+    ora #E          ; Set E bit to send instruction
+    sta PORTB
+    eor #E          ; Clear E bit
+    sta PORTB
+    pla
+    and #%00001111  ; Send low 4 bits
+    ora #RS         ; Set RS
+    sta PORTB
+    ora #E          ; Set E bit to send instruction
+    sta PORTB
+    eor #E          ; Clear E bit
+    sta PORTB
+
+    inc lcd_position
+    lda lcd_position
+    cmp #$14
+    beq goto_line2
+    rts
+goto_line2:
+    lda #%11000000
+    jsr lcd_instruction
+    rts
+
 lcd_setup:
+    lda #0
+    sta lcd_position
+
     jsr lcd_init
     lda #INS_4BIT ;4-bit mode, 5x8 font, 2 line
     jsr lcd_instruction
@@ -111,5 +154,25 @@ lcd_setup:
     lda #INS_CURSOR  ;Display on, cursor on, blink on
     jsr lcd_instruction
     rts    
+
+lcd_shift_left:
+    lda #%00010000
+    jsr lcd_instruction
+    rts
+
+lcd_shift_right:
+    lda #%00010100
+    jsr lcd_instruction
+    rts
+
+lcd_shift_display_left:
+    lda #%00011000
+    jsr lcd_instruction
+    rts
+
+lcd_shift_display_right:
+    lda #%00011100
+    jsr lcd_instruction
+    rts
 
 #endif
