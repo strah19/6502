@@ -4933,7 +4933,7 @@
     (property "Value" "NE555P" (at 201.4094 29.21 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Package_DIP:DIP-8_W7.62mm" (at 215.9 49.53 0)
+    (property "Footprint" "Package_DIP:DIP-8_W7.62mm_Socket" (at 215.9 49.53 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "http://www.ti.com/lit/ds/symlink/ne555.pdf" (at 220.98 49.53 0)
