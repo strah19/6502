@@ -3288,7 +3288,7 @@
           (reference "J?") (unit 1)
         )
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/99446e73-4cf8-4cf8-b0e5-2db38fecee4d"
-          (reference "J14") (unit 1)
+          (reference "J15") (unit 1)
         )
       )
     )
@@ -3323,7 +3323,7 @@
   (symbol (lib_id "35RAPC4BV4:35RAPC4BV4") (at 161.29 137.16 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no) (fields_autoplaced)
     (uuid 48b42d92-0a4e-4652-8e4e-acfdc4a25f41)
-    (property "Reference" "J18" (at 160.776 127 0)
+    (property "Reference" "J19" (at 160.776 127 0)
       (effects (font (size 1.27 1.27)))
     )
     (property "Value" "35RAPC4BV4" (at 160.776 129.54 0)
@@ -3355,7 +3355,7 @@
     (instances
       (project "6502v2.0"
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/99446e73-4cf8-4cf8-b0e5-2db38fecee4d"
-          (reference "J18") (unit 1)
+          (reference "J19") (unit 1)
         )
       )
     )
@@ -3537,7 +3537,7 @@
           (reference "J?") (unit 1)
         )
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/99446e73-4cf8-4cf8-b0e5-2db38fecee4d"
-          (reference "J15") (unit 1)
+          (reference "J16") (unit 1)
         )
       )
     )
@@ -3598,7 +3598,7 @@
           (reference "J?") (unit 1)
         )
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/99446e73-4cf8-4cf8-b0e5-2db38fecee4d"
-          (reference "J17") (unit 1)
+          (reference "J18") (unit 1)
         )
       )
     )
@@ -3843,7 +3843,7 @@
           (reference "J?") (unit 1)
         )
         (path "/5ffbcd12-d35a-40f1-aa31-5cc41b65e9d8/99446e73-4cf8-4cf8-b0e5-2db38fecee4d"
-          (reference "J16") (unit 1)
+          (reference "J17") (unit 1)
         )
       )
     )

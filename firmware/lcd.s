@@ -47,7 +47,6 @@ lcdbusy:
     rts
 
 lcd_read_address:
-    pha
     phx
     lda #%11110000  ; LCD data is input
     sta DDRB
@@ -62,7 +61,14 @@ lcd_read:
     sta PORTB
     lda #(RW | E)
     sta PORTB
+
     pla 
+    asl
+    asl
+    asl
+    asl
+    ora PORTB
+    tax
     
     and #%00001000
     bne lcd_read
@@ -71,7 +77,8 @@ lcd_read:
     sta PORTB
     lda #%11111111  ; LCD data is output
     sta DDRB
-    pla
+    txa
+    plx
     rts
 
 lcd_init:
