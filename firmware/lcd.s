@@ -46,41 +46,6 @@ lcdbusy:
     pla
     rts
 
-lcd_read_address:
-    phx
-    lda #%11110000  ; LCD data is input
-    sta DDRB
-lcd_read:
-    lda #RW
-    sta PORTB
-    lda #(RW | E)
-    sta PORTB
-    lda PORTB       ; Read high nibble
-    pha             ; and put on stack since it has the busy flag
-    lda #RW
-    sta PORTB
-    lda #(RW | E)
-    sta PORTB
-
-    pla 
-    asl
-    asl
-    asl
-    asl
-    ora PORTB
-    tax
-    
-    and #%00001000
-    bne lcd_read
-
-    lda #RW
-    sta PORTB
-    lda #%11111111  ; LCD data is output
-    sta DDRB
-    txa
-    plx
-    rts
-
 lcd_init:
     lda #%00000010 ; Set 4-bit mode
     sta PORTB
@@ -138,12 +103,29 @@ lcd_print:
     lda lcd_position
     cmp #$14
     beq goto_line2
+    cmp #$54
+    beq goto_line3
+    cmp #$28
+    beq goto_line4
     rts
 goto_line2:
     lda #%11000000
     jsr lcd_instruction
+    lda #$40
+    sta lcd_position
     rts
-
+goto_line3:
+    lda #%10010100
+    jsr lcd_instruction
+    lda #$14
+    sta lcd_position
+    rts
+goto_line4:
+    lda #%11010100
+    jsr lcd_instruction
+    lda #$54
+    sta lcd_position
+    rts
 lcd_setup:
     lda #0
     sta lcd_position

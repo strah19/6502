@@ -1,12 +1,12 @@
+    *=$8000
+	
 #include "basic.s"
 #include "lcd.s"
-#include "keyboard.s"
 
-; OSI Defines
-CURPOS   = $0200        ; ROM BASIC cursor position
-LOADFLAG = $0203        ; ROM BASIC LOAD flag
-SAVEFLAG = $0205        ; ROM BASIC SAVE flag
-KBD      = $DF00        ; OSI polled keyboard register
+ACIA_DATA = $7F00
+ACIA_STATUS = $7F01
+ACIA_COMMAND = $7F02
+ACIA_CONTROL = $7F03
 
 SAVE_X = $DE		; For saving registers
 SAVE_Y = $DF
@@ -29,7 +29,15 @@ RES_vec
 
 	jsr init_via_ports
     jsr lcd_setup
-    jsr kbinit
+
+    lda #$00
+    sta ACIA_STATUS             ;Soft reset
+
+    lda #$0b				;No parity, no echo, no interrupt
+    sta ACIA_COMMAND
+
+    lda #$1f				;1 stop bit, 8 data bits, 19200 baud
+    sta ACIA_CONTROL
 
 ; set up vectors and interrupt code, copy them to page 2
 
@@ -46,13 +54,15 @@ LAB_stlp
 
 ; byte out to screen
 SCRNout
+	SEI
     STX     SAVE_X                  ; Preserve X register
     STY     SAVE_Y                  ; Preserve Y register
-	
+
 	jsr lcd_print
 
     LDX     SAVE_X                  ; Restore X
     LDY     SAVE_Y                  ; Restore Y
+	CLI
 	RTS
 
 ; byte in from keyboard
@@ -60,8 +70,12 @@ KBDin
 	STX     SAVE_X                  ; Preserve X register
     STY     SAVE_Y                  ; Preserve Y register
 	
-    jsr kbinput
-
+wait_rxd_full:	 
+    lda ACIA_STATUS
+    and #$08
+    beq wait_rxd_full
+    lda ACIA_DATA
+	
     LDX     SAVE_X                  ; Restore X
     LDY     SAVE_Y                  ; Restore Y
 	RTS
@@ -80,3 +94,14 @@ LAB_vec
 	.word	OSIload		        ; load vector for EhBASIC
 	.word	OSIsave		        ; save vector for EhBASIC
 END_CODE
+
+; system vectors
+
+    *=$FFFA
+    .dsb (*-END_CODE), 0
+    *=$FFFA
+
+	.word	NMI_vec		; NMI vector
+	.word	RES_vec		; RESET vector
+	.word	IRQ_vec		; IRQ vector
+
