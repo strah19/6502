@@ -98,41 +98,6 @@ lcd_print:
     sta PORTB
     eor #E          ; Clear E bit
     sta PORTB
-
-    inc lcd_position
-    lda lcd_position
-    cmp #$14
-    beq goto_line2
-    cmp #$54
-    beq goto_line3
-    cmp #$28
-    beq goto_line4
-    cmp #$68
-    beq goto_line1
-    rts
-goto_line1:
-    lda #%10000000
-    jsr lcd_instruction
-    lda #$00
-    sta lcd_position
-    rts
-goto_line2:
-    lda #%11000000
-    jsr lcd_instruction
-    lda #$40
-    sta lcd_position
-    rts
-goto_line3:
-    lda #%10010100
-    jsr lcd_instruction
-    lda #$14
-    sta lcd_position
-    rts
-goto_line4:
-    lda #%11010100
-    jsr lcd_instruction
-    lda #$54
-    sta lcd_position
     rts
 lcd_setup:
     lda #0

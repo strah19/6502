@@ -107,6 +107,14 @@ lcd_print:
     beq goto_line3
     cmp #$28
     beq goto_line4
+    cmp #$68
+    beq goto_line1
+    rts
+goto_line1:
+    lda #%10000000
+    jsr lcd_instruction
+    lda #$00
+    sta lcd_position
     rts
 goto_line2:
     lda #%11000000

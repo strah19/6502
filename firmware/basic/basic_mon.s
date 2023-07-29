@@ -52,14 +52,23 @@ LAB_stlp
 
 	JMP LAB_COLD
 
+ASCII_RETURN = $0A
+ASCII_BACKSPACE = $0D
+
 ; byte out to screen
 SCRNout
 	SEI
     STX     SAVE_X                  ; Preserve X register
     STY     SAVE_Y                  ; Preserve Y register
 
+	cmp #ASCII_RETURN
+	beq EXITout
+	cmp #ASCII_BACKSPACE
+	beq EXITout
+
 	jsr lcd_print
 
+EXITout:
     LDX     SAVE_X                  ; Restore X
     LDY     SAVE_Y                  ; Restore Y
 	CLI
