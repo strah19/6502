@@ -84,7 +84,7 @@ wait_txd_full:
 
 tx_wait:
     phx
-    ldx #25
+    ldx #100
 tx_wait1:
     dex
     bne tx_wait1

@@ -1,20 +1,24 @@
-    *=$8000
-	
+; minimal monitor for EhBASIC and 6502 simulator V1.05
+; tabs converted to space, tabwidth=6
+
+; To run EhBASIC on the simulator load and assemble [F7] this file, start the simulator
+; running [F6] then start the code with the RESET [CTRL][SHIFT]R. Just selecting RUN
+; will do nothing, you'll still have to do a reset to run the code.
+
 #include "basic.s"
-#include "lcd.s"
+
+; put the IRQ and MNI code in RAM so that it can be changed
+
+IRQ_vec     = VEC_SV+2        ; IRQ code vector
+NMI_vec     = IRQ_vec+$0A     ; NMI code vector
+LF  = $0A        ; Line feed character
+
+; setup for the 6502 simulator environment
 
 ACIA_DATA = $7F00
 ACIA_STATUS = $7F01
 ACIA_COMMAND = $7F02
 ACIA_CONTROL = $7F03
-
-SAVE_X = $DE		; For saving registers
-SAVE_Y = $DF
-
-; put the IRQ and NMI code in RAM so that it can be changed
-
-IRQ_vec	= VEC_SV+2	; IRQ code vector
-NMI_vec	= IRQ_vec+$0A	; NMI code vector
 
 ; now the code. all this does is set up the vectors and interrupt code
 ; and wait for the user to select [C]old or [W]arm start. nothing else
@@ -23,12 +27,9 @@ NMI_vec	= IRQ_vec+$0A	; NMI code vector
 ; reset vector points here
 
 RES_vec
-	CLD				; clear decimal mode
-	LDX	#$FF			; empty stack
-	TXS				; set the stack
-
-	jsr init_via_ports
-    jsr lcd_setup
+      CLD                     ; clear decimal mode
+      LDX   #$FF              ; empty stack
+      TXS                     ; set the stack
 
     lda #$00
     sta ACIA_STATUS             ;Soft reset
@@ -41,76 +42,289 @@ RES_vec
 
 ; set up vectors and interrupt code, copy them to page 2
 
-	LDY	#END_CODE-LAB_vec	; set index/count
+      LDY   #END_CODE-LAB_vec ; set index/count
 LAB_stlp
-	LDA	LAB_vec-1,Y		; get byte from interrupt code
-	STA	VEC_IN-1,Y		; save to RAM
-	DEY				; decrement index/count
-	BNE	LAB_stlp		; loop if more to do
+      LDA   LAB_vec-1,Y       ; get byte from interrupt code
+      STA   VEC_IN-1,Y        ; save to RAM
+      DEY                     ; decrement index/count
+      BNE   LAB_stlp          ; loop if more to do
 
-	CLI
+; now do the signon message, Y = $00 here
 
-	JMP LAB_COLD
+LAB_signon
+      LDA   LAB_mess,Y        ; get byte from sign on message
+      BEQ   LAB_nokey         ; exit loop if done
 
-ASCII_RETURN = $0A
-ASCII_BACKSPACE = $0D
+      JSR   V_OUTP            ; output character
+      INY                     ; increment index
+      BNE   LAB_signon        ; loop, branch always
 
-; byte out to screen
-SCRNout
-	SEI
-    STX     SAVE_X                  ; Preserve X register
-    STY     SAVE_Y                  ; Preserve Y register
+LAB_nokey
+      JSR   V_INPT            ; call scan input device
+      BCC   LAB_nokey         ; loop if no key
 
-	cmp #ASCII_RETURN
-	beq EXITout
-	cmp #ASCII_BACKSPACE
-	beq EXITout
+      AND   #$DF              ; mask xx0x xxxx, ensure upper case
+      CMP   #'W'              ; compare with [W]arm start
+      BEQ   LAB_dowarm        ; branch if [W]arm start
 
-	jsr lcd_print
+      CMP   #'C'              ; compare with [C]old start
+      BNE   RES_vec           ; loop if not [C]old start
 
-EXITout:
-    LDX     SAVE_X                  ; Restore X
-    LDY     SAVE_Y                  ; Restore Y
-	CLI
-	RTS
+      JMP   LAB_COLD          ; do EhBASIC cold start
 
-; byte in from keyboard
-KBDin    
-	STX     SAVE_X                  ; Preserve X register
-    STY     SAVE_Y                  ; Preserve Y register
-	
-wait_rxd_full:	 
+LAB_dowarm
+      JMP   LAB_WARM          ; do EhBASIC warm start
+
+; byte out to simulated ACIA
+
+ACIAout
+    CMP     #LF                     ; Ignore line feed character
+    BEQ     Ignore
+	PHA                    ; Save A.
+    STA     ACIA_DATA      ; Output character.
+    LDA     #$ff           ; Initialize delay loop.
+TXDELAY:        
+	DEC                    ; Decrement A.
+    BNE     TXDELAY        ; Until A gets to 0.
+    PLA                    ; Restore A.
+Ignore:
+      RTS
+
+; byte in from simulated ACIA
+
+ACIAin
     lda ACIA_STATUS
     and #$08
-    beq wait_rxd_full
+	beq LAB_nobyw
     lda ACIA_DATA
-	
-    LDX     SAVE_X                  ; Restore X
-    LDY     SAVE_Y                  ; Restore Y
-	RTS
+	SEC
+    RTS
 
-OSIsave				        ; save vector for EhBASIC
-	RTS
-
-OSIload						; load vector for EhBASIC
-	RTS
+LAB_nobyw
+      CLC                     ; flag no byte received
+no_load                       ; empty load vector for EhBASIC
+no_save                       ; empty save vector for EhBASIC
+      RTS
 
 ; vector tables
 
 LAB_vec
-	.word	KBDin               ; byte in from keyboard
-	.word	SCRNout		        ; byte out to screen
-	.word	OSIload		        ; load vector for EhBASIC
-	.word	OSIsave		        ; save vector for EhBASIC
+      .word ACIAin            ; byte in from simulated ACIA
+      .word ACIAout           ; byte out to simulated ACIA
+      .word no_load           ; null load vector for EhBASIC
+      .word no_save           ; null save vector for EhBASIC
+
+; EhBASIC IRQ support
+
+IRQ_CODE
+      RTI
+
+; EhBASIC NMI support
+
+NMI_CODE
+      RTI
+
 END_CODE
 
+LAB_mess
+      .byte $0D,$0A,"6502 EhBASIC [C]old/[W]arm ?",$00
+                              ; sign on string
+
+START_WOZ
+    *=$FF00
+    .dsb (*-START_WOZ), 0
+    *=$FF00
+
+XAML  = $24                            ; Last "opened" location Low
+XAMH  = $25                            ; Last "opened" location High
+STL   = $26                            ; Store address Low
+STH   = $27                            ; Store address High
+L     = $28                            ; Hex value parsing Low
+H     = $29                            ; Hex value parsing High
+YSAV  = $2A                            ; Used to see if hex value is given
+MODE  = $2B                            ; $00=XAM, $7F=STOR, $AE=BLOCK XAM
+
+IN    = $0200                          ; Input buffer
+
+RESET:
+                LDA     #$1F           ; 8-N-1, 19200 baud.
+                STA     ACIA_CONTROL
+                LDA     #$0B           ; No parity, no echo, no interrupts.
+                STA     ACIA_COMMAND
+                LDA     #$1B           ; Begin with escape.
+
+NOTCR:
+                CMP     #$08           ; Backspace key?
+                BEQ     BACKSPACE      ; Yes.
+                CMP     #$1B           ; ESC?
+                BEQ     ESCAPE         ; Yes.
+                INY                    ; Advance text index.
+                BPL     NEXTCHAR       ; Auto ESC if line longer than 127.
+
+ESCAPE:
+                LDA     #$5C           ; "\".
+                JSR     ECHO           ; Output it.
+
+GETLINE:
+                LDA     #$0D           ; Send CR
+                JSR     ECHO
+
+                LDY     #$01           ; Initialize text index.
+BACKSPACE:      DEY                    ; Back up text index.
+                BMI     GETLINE        ; Beyond start of line, reinitialize.
+
+NEXTCHAR:
+                LDA     ACIA_STATUS    ; Check status.
+                AND     #$08           ; Key ready?
+                BEQ     NEXTCHAR       ; Loop until ready.
+                LDA     ACIA_DATA      ; Load character. B7 will be '0'.
+                STA     IN,Y           ; Add to text buffer.
+                JSR     ECHO           ; Display character.
+                CMP     #$0D           ; CR?
+                BNE     NOTCR          ; No.
+
+                LDY     #$FF           ; Reset text index.
+                LDA     #$00           ; For XAM mode.
+                TAX                    ; X=0.
+SETBLOCK:
+                ASL
+SETSTOR:
+                ASL                    ; Leaves $7B if setting STOR mode.
+                STA     MODE           ; $00 = XAM, $74 = STOR, $B8 = BLOK XAM.
+BLSKIP:
+                INY                    ; Advance text index.
+NEXTITEM:
+                LDA     IN,Y           ; Get character.
+                CMP     #$0D           ; CR?
+                BEQ     GETLINE        ; Yes, done this line.
+                CMP     #$2E           ; "."?
+                BCC     BLSKIP         ; Skip delimiter.
+                BEQ     SETBLOCK       ; Set BLOCK XAM mode.
+                CMP     #$3A           ; ":"?
+                BEQ     SETSTOR        ; Yes, set STOR mode.
+                CMP     #$52           ; "R"?
+                BEQ     RUN            ; Yes, run user program.
+                STX     L              ; $00 -> L.
+                STX     H              ;    and H.
+                STY     YSAV           ; Save Y for comparison
+
+NEXTHEX:
+                LDA     IN,Y           ; Get character for hex test.
+                EOR     #$30           ; Map digits to $0-9.
+                CMP     #$0A           ; Digit?
+                BCC     DIG            ; Yes.
+                ADC     #$88           ; Map letter "A"-"F" to $FA-FF.
+                CMP     #$FA           ; Hex letter?
+                BCC     NOTHEX         ; No, character not hex.
+DIG:
+                ASL
+                ASL                    ; Hex digit to MSD of A.
+                ASL
+                ASL
+
+                LDX     #$04           ; Shift count.
+HEXSHIFT:
+                ASL                    ; Hex digit left, MSB to carry.
+                ROL     L              ; Rotate into LSD.
+                ROL     H              ; Rotate into MSD's.
+                DEX                    ; Done 4 shifts?
+                BNE     HEXSHIFT       ; No, loop.
+                INY                    ; Advance text index.
+                BNE     NEXTHEX        ; Always taken. Check next character for hex.
+
+NOTHEX:
+                CPY     YSAV           ; Check if L, H empty (no hex digits).
+                BEQ     ESCAPE         ; Yes, generate ESC sequence.
+
+                BIT     MODE           ; Test MODE byte.
+                BVC     NOTSTOR        ; B6=0 is STOR, 1 is XAM and BLOCK XAM.
+
+                LDA     L              ; LSD's of hex data.
+                STA     (STL,X)        ; Store current 'store index'.
+                INC     STL            ; Increment store index.
+                BNE     NEXTITEM       ; Get next item (no carry).
+                INC     STH            ; Add carry to 'store index' high order.
+TONEXTITEM:     JMP     NEXTITEM       ; Get next command item.
+
+RUN:
+                JMP     (XAML)         ; Run at current XAM index.
+
+NOTSTOR:
+                BMI     XAMNEXT        ; B7 = 0 for XAM, 1 for BLOCK XAM.
+
+                LDX     #$02           ; Byte count.
+SETADR:         LDA     L-1,X          ; Copy hex data to
+                STA     STL-1,X        ;  'store index'.
+                STA     XAML-1,X       ; And to 'XAM index'.
+                DEX                    ; Next of 2 bytes.
+                BNE     SETADR         ; Loop unless X = 0.
+
+NXTPRNT:
+                BNE     PRDATA         ; NE means no address to print.
+                LDA     #$0D           ; CR.
+                JSR     ECHO           ; Output it.
+                LDA     XAMH           ; 'Examine index' high-order byte.
+                JSR     PRBYTE         ; Output it in hex format.
+                LDA     XAML           ; Low-order 'examine index' byte.
+                JSR     PRBYTE         ; Output it in hex format.
+                LDA     #$3A           ; ":".
+                JSR     ECHO           ; Output it.
+
+PRDATA:
+                LDA     #$20           ; Blank.
+                JSR     ECHO           ; Output it.
+                LDA     (XAML,X)       ; Get data byte at 'examine index'.
+                JSR     PRBYTE         ; Output it in hex format.
+XAMNEXT:        STX     MODE           ; 0 -> MODE (XAM mode).
+                LDA     XAML
+                CMP     L              ; Compare 'examine index' to hex data.
+                LDA     XAMH
+                SBC     H
+                BCS     TONEXTITEM     ; Not less, so no more data to output.
+
+                INC     XAML
+                BNE     MOD8CHK        ; Increment 'examine index'.
+                INC     XAMH
+
+MOD8CHK:
+                LDA     XAML           ; Check low-order 'examine index' byte
+                AND     #$07           ; For MOD 8 = 0
+                BPL     NXTPRNT        ; Always taken.
+
+PRBYTE:
+                PHA                    ; Save A for LSD.
+                LSR
+                LSR
+                LSR                    ; MSD to LSD position.
+                LSR
+                JSR     PRHEX          ; Output hex digit.
+                PLA                    ; Restore A.
+
+PRHEX:
+                AND     #$0F           ; Mask LSD for hex print.
+                ORA     #$30           ; Add "0".
+                CMP     #$3A           ; Digit?
+                BCC     ECHO           ; Yes, output it.
+                ADC     #$06           ; Add offset for letter.
+
+ECHO:
+                PHA                    ; Save A.
+                STA     ACIA_DATA      ; Output character.
+                LDA     #$ff           ; Initialize delay loop.
+TXDELAY_WOZ:    DEC                    ; Decrement A.
+                BNE     TXDELAY_WOZ        ; Until A gets to 0.
+                PLA                    ; Restore A.
+                RTS                    ; Return.
+
+DONE
 ; system vectors
 
     *=$FFFA
-    .dsb (*-END_CODE), 0
+    .dsb (*-DONE), 0
     *=$FFFA
+      .word NMI_vec           ; NMI vector
+      .word RESET           ; RESET vector
+      .word IRQ_vec           ; IRQ vector
 
-	.word	NMI_vec		; NMI vector
-	.word	RES_vec		; RESET vector
-	.word	IRQ_vec		; IRQ vector
-
+      .end RES_vec            ; set start at reset vector
+      
