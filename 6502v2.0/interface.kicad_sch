@@ -4418,7 +4418,7 @@
     (property "Value" "10uF" (at 233.68 40.6399 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "Capacitor_THT:C_Radial_D5.0mm_H11.0mm_P2.00mm" (at 230.8352 43.18 0)
+    (property "Footprint" "Capacitor_THT:CP_Radial_Tantal_D5.0mm_P2.50mm" (at 230.8352 43.18 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 229.87 39.37 0)
