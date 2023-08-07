@@ -6369,7 +6369,7 @@
     (property "Value" "R_POT" (at 262.89 48.4886 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Potentiometer_THT:Potentiometer_Bourns_3386P_Vertical" (at 262.89 51.435 0)
+    (property "Footprint" "8bits:3386T" (at 262.89 51.435 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 262.89 51.435 0)
