@@ -1,7 +1,7 @@
 
 CUPL(WM)        5.0a  Serial# 60008009
 Device          g22v10  Library DLIB-h-40-1
-Created         Sun Jan 01 22:51:21 2023
+Created         Fri Aug 25 08:17:54 2023
 Name            6502 decoder 
 Partno          00 
 Revision        01 
@@ -57,4 +57,4 @@ Location        USA
 *L05792 00000000000000000000010001010101
 *L05824 01010011000000110000001000000000
 *C7D40
-*A2DA
+*A2DB

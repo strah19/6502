@@ -14,7 +14,7 @@ reset:
     ldx #$ff    
     txs
 
-    jsr init_via_ports
+    jsr init_via_ports_output
     jsr lcd_setup
 
     lda #"/"

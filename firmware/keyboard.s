@@ -4,17 +4,17 @@
 #include "io.s"
 
 CLK   = $10
-DATA  = $20
+KEYBOARD_DATA  = $20
 
-byte           =     $02D0             ; byte send/received
-parity         =     $02D1             ; parity holder for rx
-special        =     $02D2             ; ctrl, shift, caps and kb LED holder 
-lastbyte       =     $02D3             ; last byte received
+byte           =     $06D0             ; byte send/received
+parity         =     $06D1             ; parity holder for rx
+special        =     $06D2             ; ctrl, shift, caps and kb LED holder 
+lastbyte       =     $06D3             ; last byte received
 
 ; kbinput - wait for a key press and return with its assigned ASCII code in A.
 ; kbget   - wait for a key press and return with its unprocessed scancode in A.
 ; kbscan  - Scan the keyboard for 105uS, returns 0 in A if no key pressed.
-;           Return ambiguous DATA in A if key is pressed.  Use KBINPUT OR KBGET
+;           Return ambiguous KEYBOARD_DATA in A if key is pressed.  Use KBINPUT OR KBGET
 ;           to get the key information.  You can modify the code to automatically 
 ;           jump to either routine if your application needs it.          
 ; kbinit  - Initialize the keyboard and associated variables and set the LEDs
@@ -133,7 +133,7 @@ kbExt:
     ldx   #$03              ; test for 4 scancode to be relocated
 kbext1:
     cmp   kbextlst,x        ; scan list
-    beq   kbext3            ; get DATA if match found
+    beq   kbext3            ; get KEYBOARD_DATA if match found
     dex                     ; get next item
     bpl   kbext1            ; 
     cmp   #$3F              ; not in list, test range 00-3f or 40-7f
@@ -221,7 +221,7 @@ kbcsrch2:
                                        ; nonzero scancode if ready for ascii conversion
 ;
 ;keyboard command/scancode test list
-; db=define byte, stores one byte of DATA
+; db=define byte, stores one byte of KEYBOARD_DATA
 ;
 kbclst:        .byte $83               ; F7 - move to scancode 02
                .byte $58               ; caps
@@ -265,11 +265,11 @@ kbscan:
 kbscan1:
     lda   #CLK              ; 
     bit   PORTA         ; 
-    beq   kbscan2           ; if CLK goes low, DATA ready
+    beq   kbscan2           ; if CLK goes low, KEYBOARD_DATA ready
     dex                     ; reduce timer
     bne   kbscan1           ; wait while CLK is high
-    jsr   kbdis             ; timed out, no DATA, disable receiver
-    lda   #$00              ; set DATA not ready flag
+    jsr   kbdis             ; timed out, no KEYBOARD_DATA, disable receiver
+    lda   #$00              ; set KEYBOARD_DATA not ready flag
     rts                     ; return 
 kbscan2:
     jsr   kbdis             ; disable the receiver so other routines get it
@@ -289,12 +289,12 @@ kbsend:
     phy                     ; 
     sta   lastbyte          ; keep just in case the send fails
     lda   PORTA         ; 
-    and   #$EF              ; CLK low, DATA high (change if port bits change)
-    ora   #DATA             ; 
+    and   #$EF              ; CLK low, KEYBOARD_DATA high (change if port bits change)
+    ora   #KEYBOARD_DATA             ; 
     sta   PORTA         ; 
     lda   DDRA         ; 
     ora   #$30              ;  bit bits high (change if port bits change)
-    sta   DDRA         ; set outputs, CLK=0, DATA=1
+    sta   DDRA         ; set outputs, CLK=0, KEYBOARD_DATA=1
     lda   #$10              ; 1Mhz cpu clock delay (delay = cpuCLK/62500)
 kbsendw:
     dec                     ; 
@@ -302,7 +302,7 @@ kbsendw:
     ldy   #$00              ; parity counter
     ldx   #$08              ; bit counter 
     lda   PORTA         ; 
-    and   #$CF              ; CLK low, DATA low (change if port bits change)
+    and   #$CF              ; CLK low, KEYBOARD_DATA low (change if port bits change)
     sta   PORTA         ; 
     lda   DDRA         ; 
     and   #$EF              ; set CLK as input (change if port bits change)
@@ -312,33 +312,33 @@ kbsend1:
     ror   byte              ; get lsb first
     bcs   kbmark            ; 
     lda   PORTA         ; 
-    and   #$DF              ; turn off DATA bit (change if port bits change)
+    and   #$DF              ; turn off KEYBOARD_DATA bit (change if port bits change)
     sta   PORTA         ; 
     bra   kbnext            ; 
 kbmark:
     lda   PORTA         ; 
-    ora   #DATA             ; 
+    ora   #KEYBOARD_DATA             ; 
     sta   PORTA         ; 
     iny                     ; inc parity counter
 kbnext:
     jsr   kbhighlow         ; 
     dex                     ; 
-    bne   kbsend1           ; send 8 DATA bits
+    bne   kbsend1           ; send 8 KEYBOARD_DATA bits
     tya                     ; get parity count
     and   #$01              ; get odd or even
     bne   kbpclr            ; if odd, send 0
     lda   PORTA         ; 
-    ora   #DATA             ; if even, send 1
+    ora   #KEYBOARD_DATA             ; if even, send 1
     sta   PORTA         ; 
     bra   kback             ; 
 kbpclr:
     lda   PORTA         ; 
-    and   #$DF              ; send DATA=0 (change if port bits change)
+    and   #$DF              ; send KEYBOARD_DATA=0 (change if port bits change)
     sta   PORTA         ; 
 kback:
     jsr   kbhighlow         ; 
     lda   DDRA         ; 
-    and   #$CF              ; set CLK & DATA to input (change if port bits change)
+    and   #$CF              ; set CLK & KEYBOARD_DATA to input (change if port bits change)
     sta   DDRA         ; 
     ply                     ; restore saved registers
     plx                     ; 
@@ -369,12 +369,12 @@ kbget1:
     bit   PORTA         ; 
     bne   kbget1            ; wait while CLK is high
     lda   PORTA         ; 
-    and   #DATA             ; get start bit 
+    and   #KEYBOARD_DATA             ; get start bit 
     bne   kbget1            ; if 1, false start bit, do again 
 kbget2:
     jsr   kbhighlow         ; wait for CLK to return high then go low again
-    cmp   #$01              ; set c if DATA bit=1, clr if DATA bit=0
-                                       ; (change if port bits change) ok unless DATA=01 or 80
+    cmp   #$01              ; set c if KEYBOARD_DATA bit=1, clr if KEYBOARD_DATA bit=0
+                                       ; (change if port bits change) ok unless KEYBOARD_DATA=01 or 80
                                        ; in that case, use ASL or LSR to set carry bit
     ror   byte              ; save bit to byte holder
     bpl   kbget3            ; 
@@ -395,17 +395,17 @@ kbget4:
     jsr   kbhighlow         ; wait for stop bit
     beq   kberror           ; 0=bad stop bit 
     lda   byte              ; if byte & parity 0,  
-    beq   kbget             ; no DATA, do again
+    beq   kbget             ; no KEYBOARD_DATA, do again
     jsr   kbdis             ; 
     lda   byte              ; 
     rts                     ; 
 ;
 kbdis:
-    lda   PORTA         ; disable kb from sending more DATA
+    lda   PORTA         ; disable kb from sending more KEYBOARD_DATA
     and   #$EF              ; CLK = 0 (change if port bits change)
     sta   PORTA         ; 
     lda   DDRA         ; set CLK to ouput low
-    and   #$CF              ; (stop more DATA until ready) (change if port bits change)
+    and   #$CF              ; (stop more KEYBOARD_DATA until ready) (change if port bits change)
     ora   #CLK              ; 
     sta   DDRA         ; 
     rts 
@@ -442,7 +442,7 @@ kbhl1:
     bit   PORTA         ; 
     bne   kbhl1             ; wait while CLK is high
     lda   PORTA         ; 
-    and   #DATA             ; get DATA line state
+    and   #KEYBOARD_DATA             ; get KEYBOARD_DATA line state
     rts 
 
 asciitbl:      .byte $00               ; 00 no key pressed

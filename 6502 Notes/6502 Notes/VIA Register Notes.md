@@ -1,0 +1,3 @@
+- NMI is a hardware interrupt. It will interrupt anything. Must disable interrupt during specific instructions.(sei, cli)
+- Should use IRQ normally.
+- 

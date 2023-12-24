@@ -6,10 +6,10 @@ NMI_vec     = IRQ_vec+$0A     ; NMI code vector
 LF  = $0A        ; Line feed character
 
 ; setup serial interface registers
-ACIA_DATA = $7F00
-ACIA_STATUS = $7F01
-ACIA_COMMAND = $7F02
-ACIA_CONTROL = $7F03
+ACIA_DATA = $7F20
+ACIA_STATUS = $7F21
+ACIA_COMMAND = $7F22
+ACIA_CONTROL = $7F23
 
 basic_reset
 	CLD                     ; clear decimal mode

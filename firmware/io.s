@@ -6,34 +6,30 @@
 #define IO_S
 
 ; VIA #1
-PORTA = $7D01
-PORTB = $7D00
+PORTA = $7F01
+PORTB = $7F00
 
 ; Direction registers
-DDRA =  $7D03
-DDRB =  $7D02
+DDRA =  $7F03
+DDRB =  $7F02
 
 ; Timer registers
-T1CL = $7D04
-T1CH = $7D05
+T1CL = $7F04
+T1CH = $7F05
 
 ; Status & Flag registers
-ACR = $7D0B
-IFR = $7D0D
-IER = $7D0E
+ACR = $7F0B
+IFR = $7F0D
+IER = $7F0E
 
 ; Port directions (HIGH = OUTPUT, LOW = INPUT)
-PORTA_IO_MASK = %11111111
-PORTB_IO_MASK = %11111111
+PORT_IO_MASK_OUTPUTS = %11111111
+PORT_IO_MASK_INPUTS = %00000000
 
-init_via_ports:
-    lda #PORTA_IO_MASK
+init_via_ports_output
+    lda #PORT_IO_MASK_OUTPUTS
     sta DDRA
-
-    lda #PORTB_IO_MASK
     sta DDRB
 
     rts
-
-
 #endif
