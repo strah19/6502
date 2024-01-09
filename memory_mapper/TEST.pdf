@@ -1,11 +1,11 @@
-{COMPONENT C:\USERS\MSTRA\ONEDRIVE\DOCUMENTS\PROJECTS\6502\MEMORY_MAPPER\TEST.SYM
+{COMPONENT C:\USERS\MSTRA\ONEDRIVE\DOCUMENTS\PROJECTS\6502\MEMORY_MAPPERV2\TEST.SYM
 
  {ENVIRONMENT
   {PDIFvrev 3.00}
   {Program "CUPL(WM) Version 5.0a"}
   {DBtype "Schematic"}
   {DBvrev 1.01}
-  {DBtime "Fri Aug 25 08:17:54 2023 "}
+  {DBtime "Fri Aug 25 08:46:13 2023 "}
   {DBunit "MIL"}
   {DBgrid 10}
   {Lyrstr "WIRES" 1 "BUS" 1 "GATE" 2 "IEEE" 2 "PINFUN" 3 "PINNUM" 1 
@@ -47,9 +47,8 @@
    {P WE {Pt "I/O"}{Lq 0}{Ploc 320 40}}
    {P ROM_CS {Pt "I/O"}{Lq 0}{Ploc 320 60}}
    {P RAM_CS {Pt "I/O"}{Lq 0}{Ploc 320 80}}
-   {P VIA1_CS {Pt "I/O"}{Lq 0}{Ploc 320 100}}
-   {P VIA2_CS {Pt "I/O"}{Lq 0}{Ploc 320 120}}
-   {P DEVICES_ {Pt "I/O"}{Lq 0}{Ploc 320 140}}
+   {P BANKED_C {Pt "I/O"}{Lq 0}{Ploc 320 100}}
+   {P DEVICES_ {Pt "I/O"}{Lq 0}{Ploc 320 120}}
   }
 
   {PKG
@@ -77,9 +76,8 @@
    {Pnl 300 90}
    {Pnl 300 110}
    {Pnl 300 130}
-   {Pnl 300 150}
 
-   {Sd A 1 2 3 5 6 7 8 9 10 11 14 15 16 17 18 19 21}
+   {Sd A 1 2 3 5 6 7 8 9 10 11 14 15 16 17 18 21}
   }
 
   {PIC
@@ -103,7 +101,6 @@
    {L 290 80 320 80}
    {L 290 100 320 100}
    {L 290 120 320 120}
-   {L 290 140 320 140}
    [Ly "PINNAM"]
    [Tj "LC"]
    {T "PHI2" 140 220}
@@ -121,9 +118,8 @@
    {T "WE" 280 40}
    {T "ROM_CS" 280 60}
    {T "RAM_CS" 280 80}
-   {T "VIA1_CS" 280 100}
-   {T "VIA2_CS" 280 120}
-   {T "DEVICES_" 280 140}
+   {T "BANKED_C" 280 100}
+   {T "DEVICES_" 280 120}
    [Ly "DEVICE"]
    [Tj "CT"]
    {T "G22V10" 210 -10}
@@ -137,7 +133,7 @@
    {EX
     [Ly "ATTR2"]
     [Ts 12][Tj "CT"][Tr 0][Tm "N"]
-    {At PLD C:\USERS\MSTRA\ONEDRIVE\DOCUMENTS\PROJECTS\6502\MEMORY_MAPPER\TEST 210 240}
+    {At PLD C:\USERS\MSTRA\ONEDRIVE\DOCUMENTS\PROJECTS\6502\MEMORY_MAPPERV2\TEST 210 240}
    }
   }
  }
@@ -175,9 +171,7 @@
    }
    {N RAM_CS
    }
-   {N VIA1_CS
-   }
-   {N VIA2_CS
+   {N BANKED_C
    }
    {N DEVICES_
    }

@@ -7,14 +7,13 @@ PIN   7 =  A12
 PIN   6 =  A13 
 PIN   5 =  A14 
 PIN   3 =  A15 
+PIN  18 =  BANKED_CS 
 PIN  21 =  DEVICES_CS 
 PIN  14 =  OE 
 PIN   1 =  PHI2 
 PIN  17 =  RAM_CS 
 PIN  16 =  ROM_CS 
 PIN   2 =  RW 
-PIN  18 =  VIA1_CS 
-PIN  19 =  VIA2_CS 
 PIN  15 =  WE 
 %END
 
@@ -23,6 +22,12 @@ FIELD Address = A15,A14,A13,A12,A11,A10,A9,A8,A7,A6,A5,A4,A3,A2,A1,A0
 %END
 
 %EQUATION
+BANKED =>
+    !A9 & !A10 & !A11 & !A12 & !A13 & !A14 & !A15
+
+!BANKED_CS =>
+    !A9 & !A10 & !A11 & !A12 & !A13 & !A14 & !A15
+
 DEVICES =>
     A8 & A9 & A10 & A11 & A12 & A13 & A14 & !A15
 
@@ -33,28 +38,32 @@ DEVICES =>
     PHI2 & RW
 
 RAM =>
-    !A8 & !A9 & A10 & A11 & A12 & A13 & A14 & !A15
-  # A10 & !A11 & A12 & !A15
-  # !A11 & !A12 & !A13 & !A15
-  # A10 & A11 & A12 & A13 & !A14 & !A15
-  # A10 & !A11 & !A12 & A13 & !A15
+    !A8 & A9 & A10 & A11 & A12 & A13 & A14 & !A15
+  # !A9 & !A10 & !A11 & !A12 & !A13 & A14 & !A15
+  # A9 & !A11 & !A12 & !A13 & !A15
+  # A9 & A10 & A11 & A12 & A13 & !A14 & !A15
   # !A10 & A11 & !A12 & !A13 & !A15
-  # !A10 & !A12 & A13 & !A15
-  # A10 & A11 & !A12 & !A15
-  # A10 & A11 & A12 & !A13 & !A15
-  # !A10 & A12 & !A15
+  # !A9 & A10 & !A12 & !A15
+  # A9 & !A12 & A13 & !A15
+  # !A9 & !A10 & !A12 & A13 & !A15
+  # !A11 & A12 & !A15
+  # A9 & A10 & A11 & !A13 & !A15
+  # A9 & !A10 & A11 & A12 & !A15
+  # !A9 & A11 & A12 & !A15
 
 !RAM_CS =>
-    !A8 & !A9 & A10 & A11 & A12 & A13 & A14 & !A15
-  # A10 & !A11 & A12 & !A15
-  # !A11 & !A12 & !A13 & !A15
-  # A10 & A11 & A12 & A13 & !A14 & !A15
-  # A10 & !A11 & !A12 & A13 & !A15
+    !A8 & A9 & A10 & A11 & A12 & A13 & A14 & !A15
+  # !A9 & !A10 & !A11 & !A12 & !A13 & !A15
+  # A9 & !A11 & !A12 & !A13 & !A15
+  # A9 & A10 & A11 & A12 & A13 & !A14 & !A15
   # !A10 & A11 & !A12 & !A13 & !A15
-  # !A10 & !A12 & A13 & !A15
-  # A10 & A11 & !A12 & !A15
-  # A10 & A11 & A12 & !A13 & !A15
-  # !A10 & A12 & !A15
+  # !A9 & A10 & !A12 & !A15
+  # A9 & !A12 & A13 & !A15
+  # !A9 & !A10 & !A12 & A13 & !A15
+  # !A11 & A12 & !A15
+  # A9 & A10 & A11 & !A13 & !A15
+  # A9 & !A10 & A11 & A12 & !A15
+  # !A9 & A11 & A12 & !A15
 
 ROM =>
     A15
@@ -62,20 +71,11 @@ ROM =>
 !ROM_CS =>
     A15 & RW
 
-VIA1 =>
-    A8 & !A9 & A10 & A11 & A12 & A13 & A14 & !A15
-
-!VIA1_CS =>
-    A8 & !A9 & A10 & A11 & A12 & A13 & A14 & !A15
-
-VIA2 =>
-    !A8 & A9 & A10 & A11 & A12 & A13 & A14 & !A15
-
-!VIA2_CS =>
-    !A8 & A9 & A10 & A11 & A12 & A13 & A14 & !A15
-
 !WE =>
     PHI2 & !RW
+
+BANKED_CS.oe  =>
+    1 
 
 DEVICES_CS.oe  =>
     1 
@@ -87,12 +87,6 @@ RAM_CS.oe  =>
     1 
 
 ROM_CS.oe  =>
-    1 
-
-VIA1_CS.oe  =>
-    1 
-
-VIA2_CS.oe  =>
     1 
 
 WE.oe  =>
