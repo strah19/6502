@@ -1,43 +1,32 @@
-/*
-    This is the main "Entry point" into the 6502 computer. There are many "libraries"
-    that can be included to make the programming experience easier and prewritten 
-    functions for IO, keyboard, serial, sound, and LCD control.
-*/
-
-    *=$8000
-
+#include "basic.s"
+#include "bios.s"
+#include "basic_mon.s"
+#include "io.s"
 #include "lcd.s"
-#include "keyboard.s"
+#include "util.s"
 
-reset:
-    ; initializes stack
-    ldx #$ff    
-    txs
+RESET:
+  ldx #$ff    
+  txs
+  
+  jsr init_timer11_freerun
 
-    jsr init_via_ports_output
-    jsr lcd_setup
+  jmp WOZ_RESET
 
-    lda #"/"
-    jsr lcd_print
+NMI:
+  rti
+IRQ:
+  jsr IRQ_VIAS
+  rti
 
-    jsr kbinit
+number: .word 1729
 
-loop:
-    jsr kbinput
-    jsr lcd_print
-    jmp loop
-
-irq:
-nmi:
-    rti
-
-program_end
+#include "wozmon.s"
 
     *=$FFFA
-    .dsb (*-program_end), 0
+    .dsb (*-END_WOZ), 0
     *=$FFFA
-
-    .word nmi
-    .word reset
-    .word irq
+      .word NMI           ; NMI vector
+      .word RESET         ; RESET vector
+      .word IRQ           ; IRQ vector
 

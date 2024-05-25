@@ -1,0 +1,8 @@
+- Implement Serial IO from 6522 to RTC.
+- Add code for the second counter on VIA #1 to be one shot.
+- Maybe implement SPI for sensors?
+- Write an audio driver.
+- Figure out a load/save system, either with SD or through serial.
+- Be able to run and load programs in RAM.
+- Need code to handle RAM banking.
+- Possibly place interrupt vectors in RAM.

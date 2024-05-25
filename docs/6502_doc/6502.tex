@@ -9,7 +9,29 @@
 \begin{document}
 \maketitle
 
+\newpage
+\section{BASIC Programming Langauge}
+\subsection{Operation}
+
+To begin operation of BASIC, it begins in the BIOS prompt. BASIC is located at address \$A85E. This is the first address of the
+program and is considered to be the entry point. To continue, type in \texttt{\$A85E R} and the BASIC prompt will load.
+First BASIC will ask for a character user input to specify if a cold or warm start is required. A 'c' indicates a cold start and should be done the first time BASIC is opened every time the computer is powered on. However, if BASIC is closed and then reopened without loss of power, a warm start can be done with the letter 'w'. Next it will ask you for RAM memory size. The user can specify how many bytes BASIC is allowed to use or by pressing enter BASIC can calculate the available number of bytes in RAM and use that. Finally, BASIC will show the word \texttt{READY} indicating to the user the system can be used.
 
 
+\section{Power-On Required System Timers}
+1 tick is 10 ms
+\begin{verbatim}
+10 LET LC = PEEK($6000)
+20 LET HC = PEEK($6001)
+30 LET CTICK = 0.01
+40 LET PS = 0
+50 LET CS = ((HC << 8) OR LC) * CTICK
+60 IF CS - PS = 1 THEN
+70 PRINT(CS)
+80 PS = CS
+90 GOTO 50
+
+x0 PRINT(C)
+\end{verbatim}
 
 \end{document}

@@ -16,7 +16,7 @@ void set_data_lines() {
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   set_address_lines();
   set_data_lines();

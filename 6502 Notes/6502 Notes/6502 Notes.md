@@ -15,3 +15,7 @@
 	sta $7F02
 ```
 - I need to write some code for SPI as well...for now I'll have to use Bit Banging.
+
+#### 1/17/2024
+- Hardware issue with the RTC. I connected the CLK and IO to the wrong traces, will have to use jumpers.
+- I also had to add a pull up resistor to the ACIA_IRQ pin because it would stay low as if there was an interrupt.
